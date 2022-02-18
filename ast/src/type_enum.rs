@@ -46,7 +46,7 @@ impl PartialEq for TypeVar {
   }
 }
 
-static ID: AtomicUsize = AtomicUsize::new(0);
+static TYPE_VAR_ID: AtomicUsize = AtomicUsize::new(0);
 
 impl TypeEnum {
   pub fn unify(&mut self, other: &mut Self) -> Result<(), TypeCheckError> {
@@ -91,7 +91,7 @@ impl TypeEnum {
 impl TypeVar {
   pub fn new() -> Self {
     Self {
-      id: ID.fetch_add(1, Ordering::SeqCst),
+      id: TYPE_VAR_ID.fetch_add(1, Ordering::SeqCst),
       value: Rc::new(RefCell::new(Box::new(None))),
     }
   }

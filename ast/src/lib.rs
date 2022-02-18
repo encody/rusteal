@@ -4,6 +4,7 @@ pub mod compilation_error;
 pub mod expression;
 pub mod program;
 pub mod type_enum;
+pub mod label;
 
 #[cfg(test)]
 mod tests {
@@ -40,19 +41,21 @@ mod tests {
         )),
         Box::new(Apply(
           Box::new(Apply(
-            Box::new(Binary::Equals),
+            Box::new(Binary::GreaterThan),
+            Box::new(Primitive::UInt64(5)),
+          )),
+          Box::new(Primitive::UInt64(6)),
+        )),
+        Box::new(Apply(
+          Box::new(Apply(
+            Box::new(Binary::NotEquals),
             Box::new(Primitive::Byteslice(b"test".to_vec())),
           )),
           Box::new(Primitive::Byteslice(b"testagain".to_vec())),
         )),
-        // Box::new(Binary::Equals(
-        //   Box::new(Primitive::UInt64(5)),
-        //   Box::new(Primitive::Byteslice(b"test".to_vec())),
-        // )),
-        // Box::new(Binary::Equals),
       ])),
     };
-    println!("{:?}", program.type_check());
+    println!("{:?}", program.type_check().unwrap());
     println!("{}", program.compile().unwrap());
   }
 }

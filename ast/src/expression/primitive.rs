@@ -12,13 +12,6 @@ pub enum Primitive {
   Byteslice(Vec<u8>),
 }
 
-// fn push_primitive(p: TypePrimitive)-> TypeEnum {
-//   TypeEnum::Arrow(
-//     Box::new(TypeEnum::Stack(vec![])),
-//     Box::new(TypeEnum::Stack(vec![p])),
-//   )
-// }
-
 impl Expression for Primitive {
   fn resolve(&self) -> Result<TypeEnum, TypeCheckError> {
     Ok(TypeEnum::Simple(match self {
@@ -38,7 +31,7 @@ impl Expression for Primitive {
             .collect::<Vec<u8>>(),
         )?;
 
-        Ok(format!("bytes \"{escaped}\""))
+        Ok(format!("byte \"{escaped}\""))
       }
     }
   }

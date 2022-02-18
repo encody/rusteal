@@ -2,6 +2,7 @@ use crate::{compilation_error::CompilationError, type_enum::{TypeEnum, TypeCheck
 
 pub mod primitive;
 pub mod seq;
+pub mod cond;
 pub mod binary;
 pub mod txn;
 pub mod apply;
