@@ -1,11 +1,12 @@
 use crate::{compilation_error::CompilationError, type_enum::{TypeEnum, TypeCheckError}};
 
+pub mod apply;
+pub mod binary;
+pub mod cond;
+pub mod constant;
 pub mod primitive;
 pub mod seq;
-pub mod cond;
-pub mod binary;
 pub mod txn;
-pub mod apply;
 
 pub trait Expression {
   fn compile(&self) -> Result<String, CompilationError>;

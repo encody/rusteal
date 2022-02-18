@@ -7,7 +7,11 @@ use crate::{
 
 use super::Expression;
 
-pub struct Cond(Box<dyn Expression>, Box<dyn Expression>, Option<Box<Self>>);
+pub struct Cond(
+  pub Box<dyn Expression>,
+  pub Box<dyn Expression>,
+  pub Option<Box<Self>>,
+);
 
 impl Expression for Cond {
   fn resolve(&self) -> Result<TypeEnum, TypeCheckError> {
