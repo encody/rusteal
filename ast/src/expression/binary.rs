@@ -1,17 +1,17 @@
 use crate::{
-  compilation_error::CompilationError,
-  type_enum::{TypeCheckError, TypeEnum, TypePrimitive, TypeVar},
+    compilation_error::CompilationError,
+    type_enum::{TypeCheckError, TypeEnum, TypePrimitive, TypeVar},
 };
 
 use super::Expression;
 
 pub enum Binary {
-  Equals,
-  NotEquals,
-  GreaterThan,
-  GreaterThanEquals,
-  LessThan,
-  LessThanEquals,
+    Equals,
+    NotEquals,
+    GreaterThan,
+    GreaterThanEquals,
+    LessThan,
+    LessThanEquals,
 }
 
 fn op(s: &str) -> Result<String, CompilationError> {
@@ -57,5 +57,4 @@ impl Expression for Binary {
       Binary::LessThan => op("<"),
       Binary::LessThanEquals => op("<="),
     }
-  }
 }
