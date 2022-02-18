@@ -8,6 +8,7 @@ pub mod binary;
 pub mod cond;
 pub mod constant;
 pub mod primitive;
+pub mod ret;
 pub mod seq;
 pub mod txn;
 
