@@ -65,21 +65,14 @@ impl TypeEnum {
                 }
             },
             (_, TypeEnum::Var(_)) => other.unify(self),
+            (TypeEnum::Simple(TypePrimitive::Halt), TypeEnum::Simple(_))
+            | (TypeEnum::Simple(_), TypeEnum::Simple(TypePrimitive::Halt)) => Ok(()),
             (TypeEnum::Simple(a), TypeEnum::Simple(b)) if a == b => Ok(()),
             (TypeEnum::Arrow(ref mut a1, ref mut a2), TypeEnum::Arrow(ref mut b1, ref mut b2)) => {
                 a1.unify(b1).and(a2.unify(b2))
             }
             (a, b) => Err(TypeCheckError::IrreconcilableTypes(a.clone(), b.clone())),
         }
-      },
-      (_, TypeEnum::Var(_)) => other.unify(self),
-      (TypeEnum::Simple(TypePrimitive::Halt), TypeEnum::Simple(_))
-      | (TypeEnum::Simple(_), TypeEnum::Simple(TypePrimitive::Halt)) => Ok(()),
-      (TypeEnum::Simple(a), TypeEnum::Simple(b)) if a == b => Ok(()),
-      (TypeEnum::Arrow(ref mut a1, ref mut a2), TypeEnum::Arrow(ref mut b1, ref mut b2)) => {
-        a1.unify(b1).and(a2.unify(b2))
-      }
-      (a, b) => Err(TypeCheckError::IrreconcilableTypes(a.clone(), b.clone())),
     }
 
     pub fn contains(&self, other: &TypeVar) -> bool {
