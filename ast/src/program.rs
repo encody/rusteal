@@ -1,5 +1,8 @@
 use crate::{
-    compilation_error::CompilationError, expression::Expression, type_enum::TypeCheckError,
+    compilation_error::CompilationError,
+    context::{CompilationContext, TypeContext},
+    expression::Expression,
+    type_enum::TypeError,
     OP_SEPARATOR,
 };
 
@@ -9,8 +12,8 @@ pub struct Program {
 }
 
 impl Program {
-    pub fn type_check(&self) -> Result<(), TypeCheckError> {
-        let resolution = (*self.body).resolve()?;
+    pub fn type_check(&self) -> Result<(), TypeError> {
+        let resolution = (*self.body).resolve(&TypeContext::default())?;
         println!("{:?}", resolution);
         Ok(())
     }
@@ -18,7 +21,7 @@ impl Program {
     pub fn compile(&self) -> Result<String, CompilationError> {
         let version = self.version;
         self.body
-            .compile()
+            .compile(&CompilationContext::default())
             .map(|compiled| format!("#pragma version {version}{OP_SEPARATOR}{compiled}"))
     }
 }

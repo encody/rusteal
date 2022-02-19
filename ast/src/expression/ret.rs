@@ -1,40 +1,44 @@
 use crate::{
-  compilation_error::CompilationError,
-  type_enum::{TypeCheckError, TypeEnum, TypePrimitive},
-  OP_SEPARATOR,
+    compilation_error::CompilationError,
+    context::{CompilationContext, TypeContext},
+    type_enum::{TypeEnum, TypeError, TypePrimitive},
+    OP_SEPARATOR,
 };
 
 use super::Expression;
 
 pub enum Ret {
-  Approve,
-  Reject,
+    Approve,
+    Reject,
 }
 
 impl Expression for Ret {
-  fn resolve(&self) -> Result<TypeEnum, TypeCheckError> {
-    Ok(TypeEnum::Simple(TypePrimitive::Halt))
-  }
+    fn resolve(&self, _: &TypeContext) -> Result<TypeEnum, TypeError> {
+        Ok(TypeEnum::Simple(TypePrimitive::Halt))
+    }
 
-  fn compile(&self) -> Result<String, CompilationError> {
-    Ok(format!(
-      "int {value}{OP_SEPARATOR}return",
-      value = match self {
-        Ret::Approve => "1",
-        Ret::Reject => "0",
-      }
-    ))
-  }
+    fn compile(&self, _: &CompilationContext) -> Result<String, CompilationError> {
+        Ok(format!(
+            "int {value}{OP_SEPARATOR}return",
+            value = match self {
+                Ret::Approve => "1",
+                Ret::Reject => "0",
+            }
+        ))
+    }
 }
 
 #[cfg(test)]
 mod tests {
-  use crate::expression::{ret::Ret, Expression};
+    use crate::{
+        context::{CompilationContext, TypeContext},
+        expression::{ret::Ret, Expression},
+    };
 
-  #[test]
-  fn test() {
-    let e = Ret::Approve;
-    println!("{:?}", e.resolve());
-    println!("{}", e.compile().unwrap());
-  }
+    #[test]
+    fn test() {
+        let e = Ret::Approve;
+        println!("{:?}", e.resolve(&TypeContext::default()));
+        println!("{}", e.compile(&CompilationContext::default()).unwrap());
+    }
 }

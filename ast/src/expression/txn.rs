@@ -1,6 +1,7 @@
 use crate::{
     compilation_error::CompilationError,
-    type_enum::{TypeCheckError, TypeEnum, TypePrimitive},
+    context::{CompilationContext, TypeContext},
+    type_enum::{TypeEnum, TypeError, TypePrimitive},
 };
 
 use super::Expression;
@@ -21,7 +22,7 @@ pub enum Txn {
 }
 
 impl Expression for Txn {
-    fn resolve(&self) -> Result<TypeEnum, TypeCheckError> {
+    fn resolve(&self, _: &TypeContext) -> Result<TypeEnum, TypeError> {
         Ok(TypeEnum::Simple(match self {
             Txn::Sender | Txn::Receiver | Txn::CloseRemainderTo | Txn::Accounts => {
                 TypePrimitive::Byteslice
@@ -30,7 +31,7 @@ impl Expression for Txn {
         }))
     }
 
-    fn compile(&self) -> Result<String, CompilationError> {
+    fn compile(&self, _: &CompilationContext) -> Result<String, CompilationError> {
         Ok(format!("txn {:?}", self))
     }
 }

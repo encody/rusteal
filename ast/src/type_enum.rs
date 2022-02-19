@@ -7,7 +7,7 @@ use std::{
 use thiserror::Error;
 
 #[derive(Error, Debug)]
-pub enum TypeCheckError {
+pub enum TypeError {
     #[error("Mismatched types: {0:?} and {1:?}")]
     MismatchedTypes(TypePrimitive, TypePrimitive),
     #[error("Irreconcilable types: {0:?} and {1:?}")]
@@ -18,6 +18,8 @@ pub enum TypeCheckError {
     StackUnderflow(TypeEnum),
     #[error("Attempt to call a non-function expression: {0:?}")]
     NonFunctionApplication(TypeEnum),
+    #[error("Unbound identifier: {0:?}")]
+    UnboundIdentifier(String),
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -50,12 +52,12 @@ impl PartialEq for TypeVar {
 static TYPE_VAR_ID: AtomicUsize = AtomicUsize::new(0);
 
 impl TypeEnum {
-    pub fn unify(&mut self, other: &mut Self) -> Result<(), TypeCheckError> {
+    pub fn unify(&mut self, other: &mut Self) -> Result<(), TypeError> {
         match (&mut self.clone(), &mut other.clone()) {
             (a, b) if a == b => Ok(()),
             (TypeEnum::Var(tv), _) => match ((*tv.value).borrow_mut()).as_mut() {
                 Some(ref mut x) => x.unify(other),
-                None if other.contains(tv) => Err(TypeCheckError::UnresolvableTypeVariable(
+                None if other.contains(tv) => Err(TypeError::UnresolvableTypeVariable(
                     tv.clone(),
                     other.clone(),
                 )),
@@ -71,7 +73,7 @@ impl TypeEnum {
             (TypeEnum::Arrow(ref mut a1, ref mut a2), TypeEnum::Arrow(ref mut b1, ref mut b2)) => {
                 a1.unify(b1).and(a2.unify(b2))
             }
-            (a, b) => Err(TypeCheckError::IrreconcilableTypes(a.clone(), b.clone())),
+            (a, b) => Err(TypeError::IrreconcilableTypes(a.clone(), b.clone())),
         }
     }
 
