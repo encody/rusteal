@@ -2,7 +2,8 @@ use std::ascii;
 
 use crate::{
     compilation_error::CompilationError,
-    type_enum::{TypeCheckError, TypeEnum, TypePrimitive},
+    context::{CompilationContext, TypeContext},
+    type_enum::{TypeEnum, TypeError, TypePrimitive},
 };
 
 use super::Expression;
@@ -13,14 +14,14 @@ pub enum Primitive {
 }
 
 impl Expression for Primitive {
-    fn resolve(&self) -> Result<TypeEnum, TypeCheckError> {
+    fn resolve(&self, _: &TypeContext) -> Result<TypeEnum, TypeError> {
         Ok(TypeEnum::Simple(match self {
             Primitive::UInt64(_) => TypePrimitive::UInt64,
             Primitive::Byteslice(_) => TypePrimitive::Byteslice,
         }))
     }
 
-    fn compile(&self) -> Result<String, CompilationError> {
+    fn compile(&self, _: &CompilationContext) -> Result<String, CompilationError> {
         match self {
             Self::UInt64(value) => Ok(format!("int {value}")),
             Self::Byteslice(value) => {

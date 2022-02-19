@@ -1,6 +1,7 @@
 pub const OP_SEPARATOR: &'static str = "\n";
 
 pub mod compilation_error;
+pub mod context;
 pub mod expression;
 pub mod label;
 pub mod program;

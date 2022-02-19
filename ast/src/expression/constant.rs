@@ -1,6 +1,7 @@
 use crate::{
     compilation_error::CompilationError,
-    type_enum::{TypeCheckError, TypeEnum, TypePrimitive},
+    context::{CompilationContext, TypeContext},
+    type_enum::{TypeEnum, TypeError, TypePrimitive},
 };
 
 use super::Expression;
@@ -16,22 +17,22 @@ pub enum OnComplete {
 }
 
 impl Expression for OnComplete {
-    fn resolve(&self) -> Result<TypeEnum, TypeCheckError> {
+    fn resolve(&self, _: &TypeContext) -> Result<TypeEnum, TypeError> {
         Ok(TypeEnum::Simple(TypePrimitive::UInt64))
     }
 
-    fn compile(&self) -> Result<String, CompilationError> {
+    fn compile(&self, _: &CompilationContext) -> Result<String, CompilationError> {
         Ok(format!("int {self:?}"))
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::expression::{constant::OnComplete, Expression};
+    use crate::{expression::{constant::OnComplete, Expression}, context::CompilationContext};
 
     #[test]
     fn test() {
         let e = OnComplete::NoOp;
-        assert_eq!(e.compile().unwrap(), "int NoOp");
+        assert_eq!(e.compile(&CompilationContext::default()).unwrap(), "int NoOp");
     }
 }

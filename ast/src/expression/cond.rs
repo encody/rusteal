@@ -1,7 +1,8 @@
 use crate::{
     compilation_error::CompilationError,
+    context::{CompilationContext, TypeContext},
     label::create_label_id,
-    type_enum::{TypeCheckError, TypeEnum, TypePrimitive},
+    type_enum::{TypeEnum, TypeError, TypePrimitive},
     OP_SEPARATOR,
 };
 
@@ -14,36 +15,36 @@ pub struct Cond(
 );
 
 impl Expression for Cond {
-    fn resolve(&self) -> Result<TypeEnum, TypeCheckError> {
+    fn resolve(&self, context: &TypeContext) -> Result<TypeEnum, TypeError> {
         let Cond(test, body, continuation) = self;
 
-        test.resolve()?
+        test.resolve(context)?
             .unify(&mut TypeEnum::Simple(TypePrimitive::UInt64))?;
-        let mut body_type = body.resolve()?;
+        let mut body_type = body.resolve(context)?;
         if let Some(ref c) = continuation {
-            let mut continuation_type = c.resolve()?;
+            let mut continuation_type = c.resolve(context)?;
             body_type.unify(&mut continuation_type)?;
         }
 
         Ok(body_type)
     }
 
-    fn compile(&self) -> Result<String, CompilationError> {
+    fn compile(&self, context: &CompilationContext) -> Result<String, CompilationError> {
         let label_id = format!("cond{}", create_label_id());
         let Cond(test, body, continuation) = self;
 
         let continuation = if let Some(c) = continuation {
-            c.compile()?
+            c.compile(context)?
         } else {
             "err".to_string()
         };
 
         let pieces = vec![
-            test.compile()?,
+            test.compile(context)?,
             format!("bnz {label_id}"),
             continuation,
             format!("{label_id}:"),
-            body.compile()?,
+            body.compile(context)?,
         ];
 
         Ok(pieces.join(OP_SEPARATOR))
@@ -52,7 +53,10 @@ impl Expression for Cond {
 
 #[cfg(test)]
 mod tests {
-    use crate::expression::{cond::Cond, primitive::Primitive, Expression};
+    use crate::{
+        context::{CompilationContext, TypeContext},
+        expression::{cond::Cond, primitive::Primitive, Expression},
+    };
 
     #[test]
     fn test() {
@@ -65,7 +69,7 @@ mod tests {
                 None,
             ))),
         );
-        println!("{:?}", prog.resolve());
-        println!("{}", prog.compile().unwrap());
+        println!("{:?}", prog.resolve(&TypeContext::default()));
+        println!("{}", prog.compile(&CompilationContext::default()).unwrap());
     }
 }

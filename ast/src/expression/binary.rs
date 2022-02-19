@@ -1,6 +1,7 @@
 use crate::{
     compilation_error::CompilationError,
-    type_enum::{TypeCheckError, TypeEnum, TypePrimitive, TypeVar},
+    context::{CompilationContext, TypeContext},
+    type_enum::{TypeEnum, TypeError, TypePrimitive, TypeVar},
 };
 
 use super::Expression;
@@ -19,7 +20,7 @@ fn op(s: &str) -> Result<String, CompilationError> {
 }
 
 impl Expression for Binary {
-    fn resolve(&self) -> Result<TypeEnum, TypeCheckError> {
+    fn resolve(&self, _: &TypeContext) -> Result<TypeEnum, TypeError> {
         Ok(match self {
             // function binary(a: uint, b: uint): uint;
             // uint -> uint -> uint
@@ -48,7 +49,7 @@ impl Expression for Binary {
         })
     }
 
-    fn compile(&self) -> Result<String, CompilationError> {
+    fn compile(&self, _: &CompilationContext) -> Result<String, CompilationError> {
         match self {
             Binary::Equals => op("=="),
             Binary::NotEquals => op("!="),
