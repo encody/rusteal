@@ -1,14 +1,23 @@
 use crate::{
     compilation_error::CompilationError,
     context::{CompilationContext, TypeContext},
-    expression::Expression,
+    expression::{seq::Seq, Expression},
     type_enum::TypeError,
-    OP_SEPARATOR,
+    MAX_TEAL_VERSION, OP_SEPARATOR,
 };
 
 pub struct Program {
     pub version: u64,
     pub body: Box<dyn Expression>,
+}
+
+impl Default for Program {
+    fn default() -> Self {
+        Program {
+            version: MAX_TEAL_VERSION,
+            body: Box::new(Seq(vec![])),
+        }
+    }
 }
 
 impl Program {

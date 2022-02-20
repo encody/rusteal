@@ -1,10 +1,13 @@
+pub const MAX_TEAL_VERSION: u64 = 5;
 pub const OP_SEPARATOR: &'static str = "\n";
 
 pub mod compilation_error;
 pub mod context;
+pub mod contract;
 pub mod expression;
 pub mod label;
 pub mod program;
+pub mod struct_def;
 pub mod type_enum;
 
 #[cfg(test)]
