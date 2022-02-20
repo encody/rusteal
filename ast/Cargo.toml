@@ -4,4 +4,6 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+strum = "0.23.0"
+strum_macros = "0.23.1"
 thiserror = "1.0.30"

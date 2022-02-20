@@ -1,3 +1,5 @@
+use strum_macros::EnumString;
+
 use crate::{
     compilation_error::CompilationError,
     context::{CompilationContext, TypeContext},
@@ -7,7 +9,7 @@ use crate::{
 use super::Expression;
 
 // TODO: Incomplete
-#[derive(Debug)]
+#[derive(Debug, EnumString)]
 pub enum Txn {
     Sender,
     Fee,

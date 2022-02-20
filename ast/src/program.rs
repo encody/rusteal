@@ -1,7 +1,7 @@
 use crate::{
     compilation_error::CompilationError,
     context::{CompilationContext, TypeContext},
-    expression::{seq::Seq, Expression},
+    expression::{primitive::Primitive, Expression},
     type_enum::TypeError,
     MAX_TEAL_VERSION, OP_SEPARATOR,
 };
@@ -15,7 +15,7 @@ impl Default for Program {
     fn default() -> Self {
         Program {
             version: MAX_TEAL_VERSION,
-            body: Box::new(Seq(vec![])),
+            body: Box::new(Primitive::UInt64(0)),
         }
     }
 }

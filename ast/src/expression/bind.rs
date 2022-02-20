@@ -92,7 +92,7 @@ impl Expression for Bind {
 mod tests {
     use crate::{
         context::{CompilationContext, TypeContext},
-        expression::{primitive::Primitive, seq::Seq, Expression, binary::Binary, apply::Apply, var::Var},
+        expression::{apply::Apply, binary::Binary, primitive::Primitive, var::Var, Expression},
     };
 
     use super::Bind;
@@ -102,15 +102,13 @@ mod tests {
         let e = Bind::Let {
             identifier: "x".to_string(),
             value: Box::new(Primitive::UInt64(5)),
-            body: Box::new(Seq(vec![
+            body: Box::new(Apply(
                 Box::new(Apply(
-                    Box::new(Apply(
-                        Box::new(Binary::Equals),
-                        Box::new(Primitive::UInt64(5)),
-                    )),
-                    Box::new(Var("x".to_string())),
+                    Box::new(Binary::Equals),
+                    Box::new(Primitive::UInt64(5)),
                 )),
-            ])),
+                Box::new(Var("x".to_string())),
+            )),
         };
         println!("{:?}", e.resolve(&TypeContext::default()));
         println!("{}", e.compile(&CompilationContext::default()).unwrap());

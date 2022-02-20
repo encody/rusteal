@@ -7,24 +7,27 @@ use crate::{
 
 use super::Expression;
 
-pub struct Seq(pub Vec<Box<dyn Expression>>);
+pub struct Seq(pub Box<dyn Expression>, pub Option<Box<dyn Expression>>);
 
 impl Expression for Seq {
     fn resolve(&self, context: &TypeContext) -> Result<TypeEnum, TypeError> {
-        self.0
-            .last()
-            .map_or(Ok(TypeEnum::Simple(TypePrimitive::Void)), |e| {
-                e.resolve(context)
-            })
+        match (self.0.resolve(context)?, &self.1) {
+            (h @ TypeEnum::Simple(TypePrimitive::Halt), _) | (h, None) => Ok(h),
+            (TypeEnum::Simple(TypePrimitive::Void), Some(t)) => t.resolve(context),
+            _ => todo!(),
+        }
     }
 
     fn compile(&self, context: &CompilationContext) -> Result<String, CompilationError> {
-        let Self(expressions) = self;
+        let Self(head, tail) = self;
 
-        expressions
-            .into_iter()
-            .map(|e| e.compile(context))
-            .collect::<Result<Vec<String>, CompilationError>>()
-            .map(|s| s.join(OP_SEPARATOR))
+        Ok(match tail {
+            Some(tail) => format!(
+                "{head}{OP_SEPARATOR}{tail}",
+                head = head.compile(context)?,
+                tail = tail.compile(context)?,
+            ),
+            None => head.compile(context)?,
+        })
     }
 }

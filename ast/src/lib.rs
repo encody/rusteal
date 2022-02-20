@@ -25,10 +25,10 @@ mod tests {
     fn test_seq_int_bytes() {
         let compiled = Program {
             version: 5,
-            body: Box::new(Seq(vec![
+            body: Box::new(Seq(
                 Box::new(Primitive::UInt64(5)),
-                Box::new(Primitive::Byteslice(b"test".to_vec())),
-            ])),
+                Some(Box::new(Primitive::Byteslice(b"test".to_vec()))),
+            )),
         }
         .compile();
         println!("{}", compiled.unwrap());
@@ -38,7 +38,7 @@ mod tests {
     fn test_types() {
         let program = Program {
             version: 5,
-            body: Box::new(Seq(vec![
+            body: Box::new(Seq(
                 Box::new(Apply(
                     Box::new(Apply(
                         Box::new(Binary::Equals),
@@ -46,21 +46,23 @@ mod tests {
                     )),
                     Box::new(Primitive::UInt64(5)),
                 )),
-                Box::new(Apply(
+                Some(Box::new(Seq(
                     Box::new(Apply(
-                        Box::new(Binary::GreaterThan),
-                        Box::new(Primitive::UInt64(5)),
+                        Box::new(Apply(
+                            Box::new(Binary::GreaterThan),
+                            Box::new(Primitive::UInt64(5)),
+                        )),
+                        Box::new(Primitive::UInt64(6)),
                     )),
-                    Box::new(Primitive::UInt64(6)),
-                )),
-                Box::new(Apply(
-                    Box::new(Apply(
-                        Box::new(Binary::NotEquals),
-                        Box::new(Primitive::Byteslice(b"test".to_vec())),
-                    )),
-                    Box::new(Primitive::Byteslice(b"testagain".to_vec())),
-                )),
-            ])),
+                    Some(Box::new(Apply(
+                        Box::new(Apply(
+                            Box::new(Binary::NotEquals),
+                            Box::new(Primitive::Byteslice(b"test".to_vec())),
+                        )),
+                        Box::new(Primitive::Byteslice(b"testagain".to_vec())),
+                    ))),
+                ))),
+            )),
         };
         println!("{:?}", program.type_check().unwrap());
         println!("{}", program.compile().unwrap());
@@ -70,24 +72,27 @@ mod tests {
     fn main_conditional() {
         let program = Program {
             version: 5,
-            body: Box::new(Seq(vec![Box::new(Cond(
-                Box::new(Apply(
+            body: Box::new(Seq(
+                Box::new(Cond(
                     Box::new(Apply(
-                        Box::new(Binary::Equals),
-                        Box::new(Primitive::UInt64(0)),
+                        Box::new(Apply(
+                            Box::new(Binary::Equals),
+                            Box::new(Primitive::UInt64(0)),
+                        )),
+                        Box::new(Txn::ApplicationID),
                     )),
-                    Box::new(Txn::ApplicationID),
+                    Box::new(Primitive::Byteslice(b"init".to_vec())),
+                    Some(Box::new(Cond(
+                        Box::new(Apply(
+                            Box::new(Apply(Box::new(Binary::Equals), Box::new(OnComplete::NoOp))),
+                            Box::new(Txn::OnCompletion),
+                        )),
+                        Box::new(Primitive::Byteslice(b"noop".to_vec())),
+                        None,
+                    ))),
                 )),
-                Box::new(Primitive::Byteslice(b"init".to_vec())),
-                Some(Box::new(Cond(
-                    Box::new(Apply(
-                        Box::new(Apply(Box::new(Binary::Equals), Box::new(OnComplete::NoOp))),
-                        Box::new(Txn::OnCompletion),
-                    )),
-                    Box::new(Primitive::Byteslice(b"noop".to_vec())),
-                    None,
-                ))),
-            ))])),
+                None,
+            )),
         };
         println!("{:?}", program.type_check().unwrap());
         println!("{}", program.compile().unwrap());
