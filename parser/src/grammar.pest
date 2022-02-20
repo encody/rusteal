@@ -1,25 +1,25 @@
-file = {
+contract = {
     SOI ~
-    (schema | txn)* ~
+    (schema | prog)* ~
     EOI
 }
 
 keyword = {
-    "if" | "txn" | "cond" | "schema" | "else" | "fn" | "true" | "false" | "let" | "return"
+    "if" | "prog" | "cond" | "schema" | "else" | "fn" | "true" | "false" | "let" | "return"
 }
 
-txn = {
-    "txn" ~ identifier ~ top_level_block
+prog = {
+    "prog" ~ identifier ~ top_level_block
 }
 
-top_level_block = {
+top_level_block = _{
     "{" ~
     top_level_expression* ~
     expression? ~
     "}"
 }
 
-top_level_expression = {
+top_level_expression = _{
     function_def | (expression ~ ";")
 }
 
@@ -37,7 +37,7 @@ expression = {
 }
 
 return_expression = {
-	"return" ~ expression ~ ";"
+    "return" ~ expression ~ ";"
 }
 
 apply_expression = {
@@ -56,7 +56,7 @@ qualified_identifier = {
     identifier ~ qualified_identifier_ext?
 }
 
-qualified_identifier_ext = {
+qualified_identifier_ext = _{
     (("." ~ identifier) | ("[" ~ expression ~ "]")) ~ qualified_identifier_ext?
 }
 
@@ -64,9 +64,7 @@ cond_expression = {
     "cond" ~ "{" ~
         (cond_arm ~ ",")* ~ cond_arm? ~
     "}" ~
-    ("else" ~ "{" ~
-        expression ~
-    "}")?
+    else_branch?
 }
 
 cond_arm = {
@@ -84,7 +82,11 @@ infix_operator = {
 if_expression = {
     "if" ~ "(" ~ expression ~ ")" ~
         expression ~
-    ("else" ~ expression)?
+    else_branch?
+}
+
+else_branch = {
+    "else" ~ expression
 }
 
 function_def = {
@@ -116,7 +118,7 @@ optionally_typed_field = {
     identifier ~ type_signature?
 }
 
-type_signature = {
+type_signature = _{
     ":" ~ datatype
 }
 
