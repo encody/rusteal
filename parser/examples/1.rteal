@@ -1,15 +1,15 @@
 schema global {
-    field_name: u64,
+    field_name: uint64,
     another_field: bytes,
 }
 
 schema local {
-    local_field: u64,
+    local_field: uint64,
     another_local: bytes,
 }
 
 txn approval {
-    fn do_thing(a: u64, b: u64): u64 {
+    fn do_thing(a: uint64, b: uint64): uint64 {
         if (a > b) {
             a - b
         } else {
@@ -27,7 +27,7 @@ txn approval {
             if (global.field_name != 0) {
                 local[0].another_local = "hello";
                 return 0;
-            }
+            };
 
             global.field_name = 1;
             return true;
