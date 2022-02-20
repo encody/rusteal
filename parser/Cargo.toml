@@ -9,5 +9,6 @@ edition = "2021"
 pest = "2.1.3"
 pest_derive = "2.1.0"
 rusteal-ast = { path = "../ast" }
+thiserror = "1.0.30"
 
 [features]
