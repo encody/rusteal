@@ -9,28 +9,20 @@ schema local {
 }
 
 prog approval {
-    fn do_thing(a: uint64, b: uint64): uint64 {
-        if (a > b) {
-            a - b
-        } else {
-            a + b
-        }
-    }
-
     cond {
         Txn.ApplicationID == 0 => {
-            let x = do_thing(12, 4);
+            let x = 12 - 4;
             x == 8
         },
         Txn.OnCompletion == DeleteApplication => false,
         Txn.OnCompletion == NoOp => {
-            if (global.field_name != 0) {
-                local[0].another_local = "hello";
+            let f = 0;
+            if (f != 0) {
                 return 0;
             };
 
-            global.field_name = 1;
-            return true;
+            let f = 1;
+            return f;
         },
     } else {
         true
