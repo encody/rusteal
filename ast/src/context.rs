@@ -1,5 +1,8 @@
+use std::rc::Rc;
+
 use crate::type_enum::TypeEnum;
 
+#[derive(Clone)]
 pub struct Scope<'a, K: PartialEq, V> {
     item: Option<(K, V)>,
     parent: Option<&'a Scope<'a, K, V>>,
@@ -38,7 +41,9 @@ impl<'a, K: PartialEq, V> Scope<'a, K, V> {
 
 #[derive(Default)]
 pub struct TypeContext<'a> {
-    pub scope: Scope<'a, String, TypeEnum>,
+    pub temp_scope: Rc<Scope<'a, String, TypeEnum>>,
+    pub global_scope: Rc<Scope<'a, String, TypeEnum>>,
+    pub local_scope: Rc<Scope<'a, String, TypeEnum>>,
 }
 
 #[derive(Default)]

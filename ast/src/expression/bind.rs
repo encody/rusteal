@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use crate::{
     compilation_error::CompilationError,
     context::{CompilationBinding, CompilationContext, TypeContext},
@@ -35,7 +37,9 @@ impl Expression for Bind {
                 identifier, body, ..
             } => {
                 let context = TypeContext {
-                    scope: context.scope.add(identifier.to_string(), value_type),
+                    temp_scope: Rc::new(context.temp_scope.add(identifier.to_string(), value_type)),
+                    global_scope: Rc::clone(&context.global_scope),
+                    local_scope: Rc::clone(&context.local_scope),
                 };
                 body.resolve(&context)
             }
@@ -92,7 +96,13 @@ impl Expression for Bind {
 mod tests {
     use crate::{
         context::{CompilationContext, TypeContext},
-        expression::{apply::Apply, binary::Binary, primitive::Primitive, var::Var, Expression},
+        expression::{
+            apply::Apply,
+            binary::Binary,
+            primitive::Primitive,
+            var::{Rvalue, Var},
+            Expression,
+        },
     };
 
     use super::Bind;
@@ -107,7 +117,7 @@ mod tests {
                     Box::new(Binary::Equals),
                     Box::new(Primitive::UInt64(5)),
                 )),
-                Box::new(Var("x".to_string())),
+                Box::new(Rvalue(Var::Temp("x".to_string()))),
             )),
         };
         println!("{:?}", e.resolve(&TypeContext::default()));
