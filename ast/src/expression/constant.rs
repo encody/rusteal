@@ -4,7 +4,7 @@ use crate::{
     type_enum::{TypeEnum, TypeError, TypePrimitive},
 };
 
-use super::Expression;
+use super::{Expression, prepend_stack};
 
 #[derive(Debug)]
 pub enum OnComplete {
@@ -21,8 +21,8 @@ impl Expression for OnComplete {
         Ok(TypeEnum::Simple(TypePrimitive::UInt64))
     }
 
-    fn compile(&self, _: &CompilationContext) -> Result<String, CompilationError> {
-        Ok(format!("int {self:?}"))
+    fn compile(&self, _: &CompilationContext, prepared_stack: Option<String>) -> Result<String, CompilationError> {
+        Ok(format!("int {self:?}")).map(prepend_stack(prepared_stack))
     }
 }
 
@@ -33,6 +33,6 @@ mod tests {
     #[test]
     fn test() {
         let e = OnComplete::NoOp;
-        assert_eq!(e.compile(&CompilationContext::default()).unwrap(), "int NoOp");
+        assert_eq!(e.compile(&CompilationContext::default(), None).unwrap(), "int NoOp");
     }
 }

@@ -5,7 +5,7 @@ use crate::{
     OP_SEPARATOR,
 };
 
-use super::Expression;
+use super::{prepend_stack, Expression};
 
 pub enum Ret {
     Approve,
@@ -17,7 +17,11 @@ impl Expression for Ret {
         Ok(TypeEnum::Simple(TypePrimitive::Halt))
     }
 
-    fn compile(&self, _: &CompilationContext) -> Result<String, CompilationError> {
+    fn compile(
+        &self,
+        _: &CompilationContext,
+        prepared_stack: Option<String>,
+    ) -> Result<String, CompilationError> {
         Ok(format!(
             "int {value}{OP_SEPARATOR}return",
             value = match self {
@@ -25,6 +29,7 @@ impl Expression for Ret {
                 Ret::Reject => "0",
             }
         ))
+        .map(prepend_stack(prepared_stack))
     }
 }
 
@@ -39,6 +44,6 @@ mod tests {
     fn test() {
         let e = Ret::Approve;
         println!("{:?}", e.resolve(&TypeContext::default()));
-        println!("{}", e.compile(&CompilationContext::default()).unwrap());
+        println!("{}", e.compile(&CompilationContext::default(), None).unwrap());
     }
 }

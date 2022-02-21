@@ -11,4 +11,6 @@ pub enum CompilationError {
     BytesStringParse(#[from] FromUtf8Error),
     #[error("Out of scratch space")]
     OutOfScratchSpace,
+    #[error("Missing stack")]
+    MissingStack,
 }

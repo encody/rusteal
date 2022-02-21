@@ -6,7 +6,7 @@ use crate::{
     type_enum::{TypeEnum, TypeError, TypePrimitive},
 };
 
-use super::Expression;
+use super::{prepend_stack, Expression};
 
 pub enum Primitive {
     UInt64(u64),
@@ -21,7 +21,11 @@ impl Expression for Primitive {
         }))
     }
 
-    fn compile(&self, _: &CompilationContext) -> Result<String, CompilationError> {
+    fn compile(
+        &self,
+        _: &CompilationContext,
+        prepared_stack: Option<String>,
+    ) -> Result<String, CompilationError> {
         match self {
             Self::UInt64(value) => Ok(format!("int {value}")),
             Self::Byteslice(value) => {
@@ -35,5 +39,6 @@ impl Expression for Primitive {
                 Ok(format!("byte \"{escaped}\""))
             }
         }
+        .map(prepend_stack(prepared_stack))
     }
 }

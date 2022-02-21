@@ -6,7 +6,7 @@ use crate::{
     OP_SEPARATOR,
 };
 
-use super::Expression;
+use super::{Expression, prepend_stack};
 
 pub struct Cond(
     pub Box<dyn Expression>,
@@ -29,25 +29,25 @@ impl Expression for Cond {
         Ok(body_type)
     }
 
-    fn compile(&self, context: &CompilationContext) -> Result<String, CompilationError> {
+    fn compile(&self, context: &CompilationContext, prepared_stack: Option<String>) -> Result<String, CompilationError> {
         let label_id = format!("cond{}", create_label_id());
         let Cond(test, body, continuation) = self;
 
         let continuation = if let Some(c) = continuation {
-            c.compile(context)?
+            c.compile(context, None)?
         } else {
             "err".to_string()
         };
 
         let pieces = vec![
-            test.compile(context)?,
+            test.compile(context, None)?,
             format!("bnz {label_id}"),
             continuation,
             format!("{label_id}:"),
-            body.compile(context)?,
+            body.compile(context, None)?,
         ];
 
-        Ok(pieces.join(OP_SEPARATOR))
+        Ok(pieces.join(OP_SEPARATOR)).map(prepend_stack(prepared_stack))
     }
 }
 
@@ -70,6 +70,6 @@ mod tests {
             ))),
         );
         println!("{:?}", prog.resolve(&TypeContext::default()));
-        println!("{}", prog.compile(&CompilationContext::default()).unwrap());
+        println!("{}", prog.compile(&CompilationContext::default(), None).unwrap());
     }
 }

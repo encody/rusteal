@@ -7,7 +7,7 @@ use crate::{
     OP_SEPARATOR,
 };
 
-use super::{primitive::Primitive, Expression};
+use super::{primitive::Primitive, Expression, prepend_stack};
 
 pub enum Bind {
     Let {
@@ -46,14 +46,14 @@ impl Expression for Bind {
         }
     }
 
-    fn compile(&self, context: &CompilationContext) -> Result<String, CompilationError> {
+    fn compile(&self, context: &CompilationContext, prepared_stack: Option<String>) -> Result<String, CompilationError> {
         match self {
             Bind::Const {
                 identifier,
                 value,
                 body,
             } => {
-                let value_compiled = value.compile(context)?;
+                let value_compiled = value.compile(context, None)?;
                 let context = CompilationContext {
                     scope: context.scope.add(
                         identifier.to_string(),
@@ -61,14 +61,14 @@ impl Expression for Bind {
                     ),
                     ..*context
                 };
-                Ok(body.compile(&context)?)
+                Ok(body.compile(&context, None)?)
             }
             Bind::Let {
                 identifier,
                 value,
                 body,
             } => {
-                let value_compiled = value.compile(context)?;
+                let value_compiled = value.compile(context, None)?;
                 let scratch_id = context.scratch_id;
                 let next_scratch_id = if context.scratch_id < u8::MAX {
                     context.scratch_id + 1
@@ -82,13 +82,14 @@ impl Expression for Bind {
                     ),
                     scratch_id: next_scratch_id,
                 };
-                let body_compiled = body.compile(&context)?;
+                let body_compiled = body.compile(&context, None)?;
                 Ok(
                     vec![value_compiled, format!("store {scratch_id}"), body_compiled]
                         .join(OP_SEPARATOR),
                 )
             }
         }
+        .map(prepend_stack(prepared_stack))
     }
 }
 
@@ -121,6 +122,6 @@ mod tests {
             )),
         };
         println!("{:?}", e.resolve(&TypeContext::default()));
-        println!("{}", e.compile(&CompilationContext::default()).unwrap());
+        println!("{}", e.compile(&CompilationContext::default(), None).unwrap());
     }
 }

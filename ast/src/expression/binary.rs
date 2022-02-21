@@ -4,7 +4,7 @@ use crate::{
     type_enum::{TypeEnum, TypeError, TypePrimitive, TypeVar},
 };
 
-use super::Expression;
+use super::{prepend_stack, Expression};
 
 pub enum Binary {
     Equals,
@@ -49,7 +49,11 @@ impl Expression for Binary {
         })
     }
 
-    fn compile(&self, _: &CompilationContext) -> Result<String, CompilationError> {
+    fn compile(
+        &self,
+        _: &CompilationContext,
+        prepared_stack: Option<String>,
+    ) -> Result<String, CompilationError> {
         match self {
             Binary::Equals => op("=="),
             Binary::NotEquals => op("!="),
@@ -58,5 +62,6 @@ impl Expression for Binary {
             Binary::LessThan => op("<"),
             Binary::LessThanEquals => op("<="),
         }
+        .map(prepend_stack(prepared_stack))
     }
 }

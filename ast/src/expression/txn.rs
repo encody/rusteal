@@ -6,7 +6,7 @@ use crate::{
     type_enum::{TypeEnum, TypeError, TypePrimitive},
 };
 
-use super::Expression;
+use super::{prepend_stack, Expression};
 
 // TODO: Incomplete
 #[derive(Debug, EnumString)]
@@ -33,8 +33,12 @@ impl Expression for Txn {
         }))
     }
 
-    fn compile(&self, _: &CompilationContext) -> Result<String, CompilationError> {
-        Ok(format!("txn {:?}", self))
+    fn compile(
+        &self,
+        _: &CompilationContext,
+        prepared_stack: Option<String>,
+    ) -> Result<String, CompilationError> {
+        Ok(format!("txn {:?}", self)).map(prepend_stack(prepared_stack))
     }
 }
 
