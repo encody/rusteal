@@ -30,7 +30,7 @@ impl Program {
     pub fn compile(&self) -> Result<String, CompilationError> {
         let version = self.version;
         self.body
-            .compile(&CompilationContext::default(), None)
+            .compile(&CompilationContext::default(), &mut vec![])
             .map(|compiled| format!("#pragma version {version}{OP_SEPARATOR}{compiled}"))
     }
 }

@@ -6,7 +6,7 @@ use crate::{
     type_enum::{TypeEnum, TypeError, TypePrimitive},
 };
 
-use super::{prepend_stack, Expression};
+use super::Expression;
 
 // TODO: Incomplete
 #[derive(Debug, EnumString)]
@@ -36,9 +36,9 @@ impl Expression for Txn {
     fn compile(
         &self,
         _: &CompilationContext,
-        prepared_stack: Option<String>,
+        _: &mut Vec<String>,
     ) -> Result<String, CompilationError> {
-        Ok(format!("txn {:?}", self)).map(prepend_stack(prepared_stack))
+        Ok(format!("txn {:?}", self))
     }
 }
 

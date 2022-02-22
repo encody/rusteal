@@ -5,7 +5,7 @@ use crate::{
     OP_SEPARATOR,
 };
 
-use super::{Expression, prepend_stack};
+use super::Expression;
 
 pub struct Seq(pub Box<dyn Expression>, pub Option<Box<dyn Expression>>);
 
@@ -18,16 +18,20 @@ impl Expression for Seq {
         }
     }
 
-    fn compile(&self, context: &CompilationContext, prepared_stack: Option<String>) -> Result<String, CompilationError> {
+    fn compile(
+        &self,
+        context: &CompilationContext,
+        prepared_stack: &mut Vec<String>,
+    ) -> Result<String, CompilationError> {
         let Self(head, tail) = self;
 
         Ok(match tail {
             Some(tail) => format!(
                 "{head}{OP_SEPARATOR}{tail}",
-                head = head.compile(context, None)?,
-                tail = tail.compile(context, None)?,
+                head = head.compile(context, &mut vec![])?,
+                tail = tail.compile(context, &mut vec![])?,
             ),
-            None => head.compile(context, None)?,
-        }).map(prepend_stack(prepared_stack))
+            None => head.compile(context, &mut vec![])?,
+        })
     }
 }

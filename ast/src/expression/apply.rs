@@ -21,9 +21,10 @@ impl Expression for Apply {
         }
     }
 
-    fn compile(&self, context: &CompilationContext, prepared_stack: Option<String>) -> Result<String, CompilationError> {
+    fn compile(&self, context: &CompilationContext, prepared_stack: &mut Vec<String>) -> Result<String, CompilationError> {
         let arg = self.1.compile(context, prepared_stack)?;
-        let f = self.0.compile(context, Some(arg))?;
+        prepared_stack.push(arg);
+        let f = self.0.compile(context, prepared_stack)?;
         Ok(f)
     }
 }

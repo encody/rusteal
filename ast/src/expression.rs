@@ -1,6 +1,6 @@
 use crate::{
     compilation_error::CompilationError,
-    context::{CompilationContext, TypeContext},
+    context::{CompilationBinding, CompilationContext, TypeContext},
     type_enum::{TypeEnum, TypeError},
     OP_SEPARATOR,
 };
@@ -21,16 +21,10 @@ pub trait Expression {
     fn compile(
         &self,
         context: &CompilationContext,
-        prepared_stack: Option<String>,
+        prepared_stack: &mut Vec<String>,
     ) -> Result<String, CompilationError>;
-}
 
-pub fn prepend_stack(prepared_stack: Option<String>) -> impl Fn(String) -> String {
-    move |compiled_expression: String| {
-        if let Some(s) = &prepared_stack {
-            format!("{s}{OP_SEPARATOR}{compiled_expression}")
-        } else {
-            compiled_expression
-        }
+    fn compile_raw(&self) -> Result<String, CompilationError> {
+        self.compile(&CompilationContext::default(), &mut Vec::new())
     }
 }
