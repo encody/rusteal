@@ -1,35 +1,30 @@
 use crate::{
-    compilation_error::CompilationError,
-    context::{CompilationBinding, CompilationContext, TypeContext},
+    context::TypeContext,
     type_enum::{TypeEnum, TypeError},
 };
 
-use super::Expression;
+mod lvalue;
+pub use lvalue::Lvalue;
+mod rvalue;
+pub use rvalue::Rvalue;
 
-pub struct Var(pub String);
+#[derive(Debug, Clone)]
+pub enum Var {
+    Bind(String),
+    Global(String),
+    Local(String),
+}
 
-impl Expression for Var {
-    fn resolve(&self, context: &TypeContext) -> Result<TypeEnum, TypeError> {
-        let Var(identifier) = self;
+impl Var {
+    pub fn get_type<'a>(&self, context: &'a TypeContext) -> Result<&'a TypeEnum, TypeError> {
+        let (identifier, scope) = match &self {
+            Var::Bind(i) => (i, &context.bind_scope),
+            Var::Global(i) => (i, &context.global_scope),
+            Var::Local(i) => (i, &context.local_scope),
+        };
 
-        context
-            .scope
-            .get(identifier)
-            .ok_or(TypeError::UnboundIdentifier(identifier.to_string()))
-            .map(|t| t.to_owned())
-    }
-
-    fn compile(&self, context: &CompilationContext) -> Result<String, CompilationError> {
-        let Var(identifier) = self;
-
-        let binding = context.scope.get(identifier).ok_or::<CompilationError>(
-            // should never happen if type checking is run before compilation
-            TypeError::UnboundIdentifier(identifier.to_string()).into(),
-        )?;
-
-        Ok(match binding {
-            CompilationBinding::Replacement(s) => s.to_string(),
-            CompilationBinding::ScratchVar(i) => format!("load {i}"),
-        })
+        scope
+            .get(&identifier)
+            .ok_or(TypeError::UnboundIdentifier(self.clone()))
     }
 }

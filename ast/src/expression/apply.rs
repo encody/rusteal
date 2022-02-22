@@ -1,8 +1,7 @@
 use crate::{
     compilation_error::CompilationError,
-    context::{TypeContext, CompilationContext},
-    type_enum::{TypeError, TypeEnum},
-    OP_SEPARATOR,
+    context::{CompilationContext, TypeContext},
+    type_enum::{TypeEnum, TypeError},
 };
 
 use super::Expression;
@@ -22,9 +21,14 @@ impl Expression for Apply {
         }
     }
 
-    fn compile(&self, context: &CompilationContext) -> Result<String, CompilationError> {
-        let f = self.0.compile(context)?;
-        let arg = self.1.compile(context)?;
-        Ok(format!("{arg}{OP_SEPARATOR}{f}"))
+    fn compile(
+        &self,
+        context: &CompilationContext,
+        prepared_stack: &mut Vec<String>,
+    ) -> Result<String, CompilationError> {
+        let arg = self.1.compile(context, prepared_stack)?;
+        prepared_stack.push(arg);
+        let f = self.0.compile(context, prepared_stack)?;
+        Ok(f)
     }
 }

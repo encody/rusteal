@@ -17,7 +17,11 @@ impl Expression for Ret {
         Ok(TypeEnum::Simple(TypePrimitive::Halt))
     }
 
-    fn compile(&self, _: &CompilationContext) -> Result<String, CompilationError> {
+    fn compile(
+        &self,
+        _: &CompilationContext,
+        _: &mut Vec<String>,
+    ) -> Result<String, CompilationError> {
         Ok(format!(
             "int {value}{OP_SEPARATOR}return",
             value = match self {
@@ -31,7 +35,7 @@ impl Expression for Ret {
 #[cfg(test)]
 mod tests {
     use crate::{
-        context::{CompilationContext, TypeContext},
+        context::TypeContext,
         expression::{ret::Ret, Expression},
     };
 
@@ -39,6 +43,6 @@ mod tests {
     fn test() {
         let e = Ret::Approve;
         println!("{:?}", e.resolve(&TypeContext::default()));
-        println!("{}", e.compile(&CompilationContext::default()).unwrap());
+        println!("{}", e.compile_raw().unwrap());
     }
 }

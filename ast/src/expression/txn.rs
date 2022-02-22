@@ -33,7 +33,11 @@ impl Expression for Txn {
         }))
     }
 
-    fn compile(&self, _: &CompilationContext) -> Result<String, CompilationError> {
+    fn compile(
+        &self,
+        _: &CompilationContext,
+        _: &mut Vec<String>,
+    ) -> Result<String, CompilationError> {
         Ok(format!("txn {:?}", self))
     }
 }

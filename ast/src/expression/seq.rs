@@ -18,16 +18,20 @@ impl Expression for Seq {
         }
     }
 
-    fn compile(&self, context: &CompilationContext) -> Result<String, CompilationError> {
+    fn compile(
+        &self,
+        context: &CompilationContext,
+        _: &mut Vec<String>,
+    ) -> Result<String, CompilationError> {
         let Self(head, tail) = self;
 
         Ok(match tail {
             Some(tail) => format!(
                 "{head}{OP_SEPARATOR}{tail}",
-                head = head.compile(context)?,
-                tail = tail.compile(context)?,
+                head = head.compile(context, &mut vec![])?,
+                tail = tail.compile(context, &mut vec![])?,
             ),
-            None => head.compile(context)?,
+            None => head.compile(context, &mut vec![])?,
         })
     }
 }

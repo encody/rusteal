@@ -21,18 +21,22 @@ impl Expression for OnComplete {
         Ok(TypeEnum::Simple(TypePrimitive::UInt64))
     }
 
-    fn compile(&self, _: &CompilationContext) -> Result<String, CompilationError> {
+    fn compile(
+        &self,
+        _: &CompilationContext,
+        _: &mut Vec<String>,
+    ) -> Result<String, CompilationError> {
         Ok(format!("int {self:?}"))
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::{expression::{constant::OnComplete, Expression}, context::CompilationContext};
+    use crate::expression::{constant::OnComplete, Expression};
 
     #[test]
     fn test() {
         let e = OnComplete::NoOp;
-        assert_eq!(e.compile(&CompilationContext::default()).unwrap(), "int NoOp");
+        assert_eq!(e.compile_raw().unwrap(), "int NoOp");
     }
 }

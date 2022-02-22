@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use crate::{
     compilation_error::CompilationError,
     context::{CompilationBinding, CompilationContext, TypeContext},
@@ -35,21 +37,31 @@ impl Expression for Bind {
                 identifier, body, ..
             } => {
                 let context = TypeContext {
-                    scope: context.scope.add(identifier.to_string(), value_type),
+                    bind_scope: Rc::new(
+                        context
+                            .bind_scope
+                            .add(identifier.to_string(), value_type),
+                    ),
+                    global_scope: Rc::clone(&context.global_scope),
+                    local_scope: Rc::clone(&context.local_scope),
                 };
                 body.resolve(&context)
             }
         }
     }
 
-    fn compile(&self, context: &CompilationContext) -> Result<String, CompilationError> {
+    fn compile(
+        &self,
+        context: &CompilationContext,
+        _: &mut Vec<String>,
+    ) -> Result<String, CompilationError> {
         match self {
             Bind::Const {
                 identifier,
                 value,
                 body,
             } => {
-                let value_compiled = value.compile(context)?;
+                let value_compiled = value.compile(context, &mut Vec::new())?;
                 let context = CompilationContext {
                     scope: context.scope.add(
                         identifier.to_string(),
@@ -57,14 +69,14 @@ impl Expression for Bind {
                     ),
                     ..*context
                 };
-                Ok(body.compile(&context)?)
+                Ok(body.compile(&context, &mut vec![])?)
             }
             Bind::Let {
                 identifier,
                 value,
                 body,
             } => {
-                let value_compiled = value.compile(context)?;
+                let value_compiled = value.compile(context, &mut Vec::new())?;
                 let scratch_id = context.scratch_id;
                 let next_scratch_id = if context.scratch_id < u8::MAX {
                     context.scratch_id + 1
@@ -78,7 +90,7 @@ impl Expression for Bind {
                     ),
                     scratch_id: next_scratch_id,
                 };
-                let body_compiled = body.compile(&context)?;
+                let body_compiled = body.compile(&context, &mut vec![])?;
                 Ok(
                     vec![value_compiled, format!("store {scratch_id}"), body_compiled]
                         .join(OP_SEPARATOR),
@@ -91,8 +103,14 @@ impl Expression for Bind {
 #[cfg(test)]
 mod tests {
     use crate::{
-        context::{CompilationContext, TypeContext},
-        expression::{apply::Apply, binary::Binary, primitive::Primitive, var::Var, Expression},
+        context::TypeContext,
+        expression::{
+            apply::Apply,
+            binary::Binary,
+            primitive::Primitive,
+            var::{Rvalue, Var},
+            Expression,
+        },
     };
 
     use super::Bind;
@@ -107,10 +125,10 @@ mod tests {
                     Box::new(Binary::Equals),
                     Box::new(Primitive::UInt64(5)),
                 )),
-                Box::new(Var("x".to_string())),
+                Box::new(Rvalue(Var::Bind("x".to_string()))),
             )),
         };
         println!("{:?}", e.resolve(&TypeContext::default()));
-        println!("{}", e.compile(&CompilationContext::default()).unwrap());
+        println!("{}", e.compile_raw().unwrap());
     }
 }

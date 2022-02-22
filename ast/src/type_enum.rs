@@ -6,6 +6,8 @@ use std::{
 
 use thiserror::Error;
 
+use crate::expression::var::Var;
+
 #[derive(Error, Debug)]
 pub enum TypeError {
     #[error("Mismatched types: {0:?} and {1:?}")]
@@ -19,7 +21,7 @@ pub enum TypeError {
     #[error("Attempt to call a non-function expression: {0:?}")]
     NonFunctionApplication(TypeEnum),
     #[error("Unbound identifier: {0:?}")]
-    UnboundIdentifier(String),
+    UnboundIdentifier(Var),
 }
 
 #[derive(Debug, PartialEq, Clone)]
