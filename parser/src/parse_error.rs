@@ -10,4 +10,8 @@ pub enum ParseError<'a> {
     InvalidSchemaName(&'a str),
     #[error("Duplicate schema name {0}")]
     DuplicateSchemaName(&'a str),
+    #[error("Cond expression must have at least one arm")]
+    EmptyCondExpression,
+    #[error("Unknown qualified identifier {0}")]
+    UnknownQualifiedIdentifier(&'a str),
 }

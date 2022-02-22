@@ -2,7 +2,8 @@ extern crate pest;
 #[macro_use]
 extern crate pest_derive;
 
-use std::collections::HashMap;
+use core::slice;
+use std::{collections::HashMap, str::FromStr, vec};
 
 use parse_error::ParseError;
 use pest::{
@@ -10,8 +11,15 @@ use pest::{
     Parser,
 };
 use rusteal_ast::{
-    contract::Contract, expression::{Expression, cond::Cond}, program::Program, struct_def::StructDef,
-    type_enum::TypePrimitive, MAX_TEAL_VERSION,
+    contract::Contract,
+    expression::{
+        apply::Apply, binary::Binary, cond::Cond, primitive::Primitive, seq::Seq, txn::Txn,
+        var::Var, Expression,
+    },
+    program::Program,
+    struct_def::StructDef,
+    typing::TypePrimitive,
+    MAX_TEAL_VERSION,
 };
 use thiserror::Error;
 
@@ -32,12 +40,129 @@ fn parse_function_def(pair: Pair<Rule>) -> Result<Box<dyn Expression>, ParseErro
     todo!()
 }
 
-fn parse_cond_expression(pair: Pair<Rule>) -> Result<Cond, ParseError> {
+fn parse_cond_arm(
+    pair: Pair<Rule>,
+) -> Result<(Box<dyn Expression>, Box<dyn Expression>), ParseError> {
     todo!()
 }
 
-fn parse_expression(pair: Pair<Rule>) -> Result<Box<dyn Expression>, ParseError> {
-    todo!()
+fn fold_cond(
+    mut i: vec::IntoIter<(Box<dyn Expression>, Box<dyn Expression>)>,
+) -> Option<Box<Cond>> {
+    let next = i.next();
+    match next {
+        Some((test, expr)) => Some(Box::new(Cond(test, expr, fold_cond(i)))),
+        _ => None,
+    }
+}
+
+fn parse_cond_expression(pair: Pair<Rule>) -> Result<Box<dyn Expression>, ParseError> {
+    match pair.as_rule() {
+        Rule::cond_expression => {
+            let arms = pair
+                .into_inner()
+                .map(|p| parse_cond_arm(p))
+                .collect::<Result<Vec<_>, ParseError>>()?;
+
+            Ok(
+                fold_cond(arms.into_iter()).ok_or(ParseError::EmptyCondExpression)?
+                    as Box<dyn Expression>,
+            )
+        }
+        _ => unreachable!(),
+    }
+}
+
+fn parse_literal_expression(pair: Pair<Rule>) -> Result<Primitive, ParseError> {
+    match pair.as_rule() {
+        Rule::literal_expression => {
+            let lit = pair.into_inner().next().unwrap();
+            match lit.as_rule() {
+                Rule::uint64 => Ok(Primitive::UInt64(lit.as_str().parse().unwrap())),
+                Rule::boolean => Ok(Primitive::UInt64(if lit.as_str() == "false" {
+                    0
+                } else {
+                    1
+                })),
+                Rule::bytes => Ok(Primitive::Byteslice(lit.as_str().as_bytes().to_vec())),
+                _ => unreachable!(),
+            }
+        }
+        _ => unreachable!(),
+    }
+}
+
+fn parse_qualified_identifier(pair: Pair<Rule>) -> Result<Vec<&str>, ParseError> {
+    match pair.as_rule() {
+        Rule::qualified_identifier => pair
+            .into_inner()
+            .map(|i| parse_identifier(i))
+            .collect::<Result<Vec<&str>, ParseError>>(),
+        _ => unreachable!(),
+    }
+}
+
+fn parse_binary_operation(
+    lhs: Box<dyn Expression>,
+    pair: Pair<Rule>,
+) -> Result<Box<dyn Expression>, ParseError> {
+    match pair.as_rule() {
+        Rule::binary_operation => {
+            let mut i = pair.into_inner();
+            let operator = i.next().unwrap();
+            let rhs = parse_expression(i.next().unwrap())?;
+            match operator.as_str() {
+                ";" => Ok(Box::new(Seq(lhs, Some(rhs)))),
+                ">" => Ok(Box::new(Apply(
+                    Box::new(Apply(Box::new(Binary::GreaterThan), rhs)),
+                    lhs,
+                ))),
+                _ => todo!(),
+            }
+        }
+        _ => unreachable!(),
+    }
+}
+
+fn parse_expression(pair1: Pair<Rule>) -> Result<Box<dyn Expression>, ParseError> {
+    match pair1.as_rule() {
+        Rule::expression => {
+            let mut i = pair1.into_inner();
+            let pair = i.next().unwrap();
+
+            let as_str = pair.as_str();
+            let rule = pair.as_rule();
+            let expr = match rule {
+                // parenthesized/bracketed expressions result in nesting
+                Rule::expression => parse_expression(i.next().unwrap()),
+                Rule::literal_expression => parse_literal_expression(i.next().unwrap())
+                    .map(|p| Box::new(p) as Box<dyn Expression>),
+                Rule::cond_expression => parse_cond_expression(i.next().unwrap()),
+                Rule::qualified_identifier => {
+                    let i_vec = parse_qualified_identifier(i.next().unwrap())?;
+                    match &i_vec[..] {
+                        [i] => Ok(Box::new(Var(i.to_string())) as Box<dyn Expression>),
+                        ["Txn", s] => Txn::from_str(s)
+                            .map(|v| Box::new(v) as Box<dyn Expression>)
+                            .map_err(|_| ParseError::UnknownQualifiedIdentifier(as_str)),
+                        _ => Err(ParseError::UnknownQualifiedIdentifier(as_str)),
+                    }
+                }
+                _ => unreachable!(),
+            };
+
+            let bin_pair = i.next();
+            if let Some(bin_pair) = bin_pair {
+                match bin_pair {
+                    // Rule::binary_operation => {}
+                    _ => todo!()
+                }
+            }
+
+            expr
+        }
+        _ => unreachable!(),
+    }
 }
 
 fn parse_prog(pair: Pair<Rule>) -> Result<(&str, Program), ParseError> {
