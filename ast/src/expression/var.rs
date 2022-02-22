@@ -10,7 +10,7 @@ pub use rvalue::Rvalue;
 
 #[derive(Debug, Clone)]
 pub enum Var {
-    Temp(String),
+    Bind(String),
     Global(String),
     Local(String),
 }
@@ -18,7 +18,7 @@ pub enum Var {
 impl Var {
     pub fn get_type<'a>(&self, context: &'a TypeContext) -> Result<&'a TypeEnum, TypeError> {
         let (identifier, scope) = match &self {
-            Var::Temp(i) => (i, &context.temp_scope),
+            Var::Bind(i) => (i, &context.bind_scope),
             Var::Global(i) => (i, &context.global_scope),
             Var::Local(i) => (i, &context.local_scope),
         };

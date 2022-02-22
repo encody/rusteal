@@ -41,7 +41,7 @@ impl<'a, K: PartialEq, V> Scope<'a, K, V> {
 
 #[derive(Default)]
 pub struct TypeContext<'a> {
-    pub temp_scope: Rc<Scope<'a, String, TypeEnum>>,
+    pub bind_scope: Rc<Scope<'a, String, TypeEnum>>,
     pub global_scope: Rc<Scope<'a, String, TypeEnum>>,
     pub local_scope: Rc<Scope<'a, String, TypeEnum>>,
 }
@@ -52,6 +52,7 @@ pub struct CompilationContext<'a> {
     pub scratch_id: u8,
 }
 
+#[derive(Debug, Clone)]
 pub enum CompilationBinding {
     ScratchVar(u8),
     Replacement(String),

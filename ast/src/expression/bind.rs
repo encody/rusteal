@@ -37,7 +37,11 @@ impl Expression for Bind {
                 identifier, body, ..
             } => {
                 let context = TypeContext {
-                    temp_scope: Rc::new(context.temp_scope.add(identifier.to_string(), value_type)),
+                    bind_scope: Rc::new(
+                        context
+                            .bind_scope
+                            .add(identifier.to_string(), value_type),
+                    ),
                     global_scope: Rc::clone(&context.global_scope),
                     local_scope: Rc::clone(&context.local_scope),
                 };
@@ -121,7 +125,7 @@ mod tests {
                     Box::new(Binary::Equals),
                     Box::new(Primitive::UInt64(5)),
                 )),
-                Box::new(Rvalue(Var::Temp("x".to_string()))),
+                Box::new(Rvalue(Var::Bind("x".to_string()))),
             )),
         };
         println!("{:?}", e.resolve(&TypeContext::default()));

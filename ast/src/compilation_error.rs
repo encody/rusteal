@@ -1,4 +1,4 @@
-use crate::type_enum::TypeError;
+use crate::{context::CompilationBinding, type_enum::TypeError};
 use std::string::FromUtf8Error;
 
 use thiserror::Error;
@@ -13,4 +13,6 @@ pub enum CompilationError {
     OutOfScratchSpace,
     #[error("Missing stack")]
     MissingStack,
+    #[error("Attempt to assign to constant expression: {0:?}")]
+    ConstantAssignment(CompilationBinding),
 }

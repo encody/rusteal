@@ -40,7 +40,7 @@ impl Expression for Rvalue {
                 push_identifier = Primitive::Byteslice(identifier.as_bytes().to_vec())
                     .compile(context, &mut Vec::new())?
             )),
-            Var::Temp(identifier) => {
+            Var::Bind(identifier) => {
                 let binding = context.scope.get(&identifier).ok_or::<CompilationError>(
                     // should never happen if type checking is run before compilation
                     TypeError::UnboundIdentifier(self.0.clone()).into(),
