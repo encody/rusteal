@@ -37,11 +37,7 @@ impl Expression for Bind {
                 identifier, body, ..
             } => {
                 let context = TypeContext {
-                    bind_scope: Rc::new(
-                        context
-                            .bind_scope
-                            .add(identifier.to_string(), value_type),
-                    ),
+                    bind_scope: Rc::new(context.bind_scope.add(identifier.to_string(), value_type)),
                     global_scope: Rc::clone(&context.global_scope),
                     local_scope: Rc::clone(&context.local_scope),
                 };

@@ -1,5 +1,6 @@
 use std::{
     cell::RefCell,
+    fmt::Display,
     rc::Rc,
     sync::atomic::{AtomicUsize, Ordering},
 };
@@ -31,12 +32,55 @@ pub enum TypeEnum {
     Var(TypeVar),
 }
 
+impl TypeEnum {
+    fn used_tvars(&self) -> Vec<usize> {
+        match self {
+            TypeEnum::Var(v) => {
+                vec![v.id]
+            }
+            TypeEnum::Arrow(a, b) => {
+                // must maintain element order AND uniqueness
+                let used = a.used_tvars();
+                used.clone()
+                    .into_iter()
+                    .chain(b.used_tvars().into_iter().filter(|e| !used.contains(e)))
+                    .collect::<Vec<usize>>()
+            }
+            _ => {
+                vec![]
+            }
+        }
+    }
+}
+
+impl Display for TypeEnum {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let tvars = self.used_tvars();
+        write!(f, "{}", self.stringify_with_tvars(&tvars))
+    }
+}
+
 #[derive(Debug, PartialEq, Clone)]
 pub enum TypePrimitive {
     Void,
     UInt64,
     Byteslice,
     Halt,
+}
+
+impl Display for TypePrimitive {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                TypePrimitive::Void => "<void>",
+                TypePrimitive::UInt64 => "int",
+                TypePrimitive::Byteslice => "bytes",
+                TypePrimitive::Halt => "<halt>",
+            }
+        )
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -92,6 +136,24 @@ impl TypeEnum {
             TypeEnum::Arrow(a, b) => a.contains(other) || b.contains(other),
             _ => false,
         }
+    }
+
+    fn stringify_with_tvars(&self, tvars: &Vec<usize>) -> String {
+        format!(
+            "{}",
+            match self {
+                TypeEnum::Simple(s) => format!("{}", s),
+                TypeEnum::Arrow(a, b) => format!(
+                    "{} -> {}",
+                    a.stringify_with_tvars(tvars),
+                    b.stringify_with_tvars(tvars)
+                ),
+                TypeEnum::Var(v) => format!(
+                    "'{}",
+                    (tvars.iter().position(|x| x == &v.id).unwrap() as u8 + ('a' as u8)) as char
+                ),
+            }
+        )
     }
 }
 
@@ -182,5 +244,52 @@ mod tests {
         a.unify(&mut b).unwrap();
         println!("{:?}", a);
         println!("{:?}", b);
+    }
+
+    #[test]
+    fn type_display() {
+        assert_eq!("int", TypeEnum::Simple(TypePrimitive::UInt64).to_string());
+        assert_eq!("<void>", TypeEnum::Simple(TypePrimitive::Void).to_string());
+        assert_eq!(
+            "int -> int",
+            TypeEnum::Arrow(
+                Box::new(TypeEnum::Simple(TypePrimitive::UInt64)),
+                Box::new(TypeEnum::Simple(TypePrimitive::UInt64)),
+            )
+            .to_string()
+        );
+        let tv = TypeVar::new();
+        assert_eq!(
+            "'a -> 'a",
+            TypeEnum::Arrow(
+                Box::new(TypeEnum::Var(tv.clone())),
+                Box::new(TypeEnum::Var(tv.clone())),
+            )
+            .to_string()
+        );
+        let tv1 = TypeVar::new();
+        let tv2 = TypeVar::new();
+        assert_eq!(
+            "'a -> 'b",
+            TypeEnum::Arrow(
+                Box::new(TypeEnum::Var(tv1.clone())),
+                Box::new(TypeEnum::Var(tv2.clone())),
+            )
+            .to_string()
+        );
+
+        let tv1 = TypeVar::new();
+        let tv2 = TypeVar::new();
+        assert_eq!(
+            "'a -> 'b -> 'a",
+            TypeEnum::Arrow(
+                Box::new(TypeEnum::Var(tv1.clone())),
+                Box::new(TypeEnum::Arrow(
+                    Box::new(TypeEnum::Var(tv2.clone())),
+                    Box::new(TypeEnum::Var(tv1.clone())),
+                )),
+            )
+            .to_string()
+        );
     }
 }
