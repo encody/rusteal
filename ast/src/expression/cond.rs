@@ -6,7 +6,7 @@ use crate::{
     OP_SEPARATOR,
 };
 
-use super::{Expression};
+use super::Expression;
 
 pub struct Cond(
     pub Box<dyn Expression>,
@@ -29,7 +29,11 @@ impl Expression for Cond {
         Ok(body_type)
     }
 
-    fn compile(&self, context: &CompilationContext, prepared_stack: &mut Vec<String>) -> Result<String, CompilationError> {
+    fn compile(
+        &self,
+        context: &CompilationContext,
+        _: &mut Vec<String>,
+    ) -> Result<String, CompilationError> {
         let label_id = format!("cond{}", create_label_id());
         let Cond(test, body, continuation) = self;
 
@@ -54,7 +58,7 @@ impl Expression for Cond {
 #[cfg(test)]
 mod tests {
     use crate::{
-        context::{CompilationContext, TypeContext},
+        context::TypeContext,
         expression::{cond::Cond, primitive::Primitive, Expression},
     };
 

@@ -6,7 +6,7 @@ use crate::{
     type_enum::{TypeEnum, TypeError, TypePrimitive},
 };
 
-use super::{Expression};
+use super::Expression;
 
 pub enum Primitive {
     UInt64(u64),

@@ -21,7 +21,7 @@ impl Expression for Seq {
     fn compile(
         &self,
         context: &CompilationContext,
-        prepared_stack: &mut Vec<String>,
+        _: &mut Vec<String>,
     ) -> Result<String, CompilationError> {
         let Self(head, tail) = self;
 

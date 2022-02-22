@@ -1,8 +1,7 @@
 use crate::{
     compilation_error::CompilationError,
-    context::{CompilationBinding, CompilationContext, TypeContext},
+    context::{CompilationContext, TypeContext},
     type_enum::{TypeEnum, TypeError},
-    OP_SEPARATOR,
 };
 
 pub mod apply;

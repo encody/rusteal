@@ -56,7 +56,7 @@ mod tests {
     use std::rc::Rc;
 
     use crate::{
-        context::{CompilationContext, Scope, TypeContext},
+        context::{Scope, TypeContext},
         expression::{apply::Apply, primitive::Primitive, var::Var, Expression},
         type_enum::{TypeEnum, TypePrimitive},
     };

@@ -35,7 +35,7 @@ impl Expression for Ret {
 #[cfg(test)]
 mod tests {
     use crate::{
-        context::{CompilationContext, TypeContext},
+        context::TypeContext,
         expression::{ret::Ret, Expression},
     };
 

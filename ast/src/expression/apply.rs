@@ -1,7 +1,7 @@
 use crate::{
     compilation_error::CompilationError,
-    context::{TypeContext, CompilationContext},
-    type_enum::{TypeError, TypeEnum},
+    context::{CompilationContext, TypeContext},
+    type_enum::{TypeEnum, TypeError},
 };
 
 use super::Expression;
@@ -21,7 +21,11 @@ impl Expression for Apply {
         }
     }
 
-    fn compile(&self, context: &CompilationContext, prepared_stack: &mut Vec<String>) -> Result<String, CompilationError> {
+    fn compile(
+        &self,
+        context: &CompilationContext,
+        prepared_stack: &mut Vec<String>,
+    ) -> Result<String, CompilationError> {
         let arg = self.1.compile(context, prepared_stack)?;
         prepared_stack.push(arg);
         let f = self.0.compile(context, prepared_stack)?;

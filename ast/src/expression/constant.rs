@@ -32,10 +32,7 @@ impl Expression for OnComplete {
 
 #[cfg(test)]
 mod tests {
-    use crate::{
-        context::CompilationContext,
-        expression::{constant::OnComplete, Expression},
-    };
+    use crate::expression::{constant::OnComplete, Expression};
 
     #[test]
     fn test() {
