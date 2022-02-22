@@ -2,7 +2,7 @@ use crate::{
     compilation_error::CompilationError,
     context::{CompilationBinding, CompilationContext, TypeContext},
     expression::{primitive::Primitive, Expression},
-    type_enum::{TypeEnum, TypeError, TypePrimitive},
+    typing::{TypeEnum, TypeError, TypePrimitive},
     OP_SEPARATOR,
 };
 
@@ -81,7 +81,7 @@ mod tests {
     use crate::{
         context::{CompilationBinding, CompilationContext, Scope, TypeContext},
         expression::{apply::Apply, primitive::Primitive, var::Var, Expression},
-        type_enum::{TypeEnum, TypePrimitive},
+        typing::{TypeEnum, TypePrimitive},
     };
 
     use super::Lvalue;

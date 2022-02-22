@@ -1,7 +1,7 @@
 use crate::{
     compilation_error::CompilationError,
     context::{CompilationContext, TypeContext},
-    type_enum::{TypeEnum, TypeError},
+    typing::{TypeEnum, TypeError},
 };
 
 pub mod apply;

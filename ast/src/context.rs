@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use crate::type_enum::TypeEnum;
+use crate::typing::TypeEnum;
 
 #[derive(Clone)]
 pub struct Scope<'a, K: PartialEq, V> {

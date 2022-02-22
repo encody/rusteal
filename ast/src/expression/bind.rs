@@ -3,7 +3,7 @@ use std::rc::Rc;
 use crate::{
     compilation_error::CompilationError,
     context::{CompilationBinding, CompilationContext, TypeContext},
-    type_enum::{TypeEnum, TypeError},
+    typing::{TypeEnum, TypeError},
     OP_SEPARATOR,
 };
 

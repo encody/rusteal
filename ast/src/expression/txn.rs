@@ -3,7 +3,7 @@ use strum_macros::EnumString;
 use crate::{
     compilation_error::CompilationError,
     context::{CompilationContext, TypeContext},
-    type_enum::{TypeEnum, TypeError, TypePrimitive},
+    typing::{TypeEnum, TypeError, TypePrimitive},
 };
 
 use super::Expression;

@@ -2,7 +2,7 @@ use crate::{
     compilation_error::CompilationError,
     context::{CompilationContext, TypeContext},
     expression::{primitive::Primitive, Expression},
-    type_enum::TypeError,
+    typing::TypeError,
     MAX_TEAL_VERSION, OP_SEPARATOR,
 };
 

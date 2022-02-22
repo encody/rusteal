@@ -2,7 +2,7 @@ use crate::{
     compilation_error::CompilationError,
     context::{CompilationContext, TypeContext},
     label::create_label_id,
-    type_enum::{TypeEnum, TypeError, TypePrimitive},
+    typing::{TypeEnum, TypeError, TypePrimitive},
     OP_SEPARATOR,
 };
 

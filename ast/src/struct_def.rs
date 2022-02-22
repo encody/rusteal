@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::type_enum::TypePrimitive;
+use crate::typing::TypePrimitive;
 
 #[derive(Default)]
 pub struct StructDef<'a> {

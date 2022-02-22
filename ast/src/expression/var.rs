@@ -1,6 +1,6 @@
 use crate::{
     context::TypeContext,
-    type_enum::{TypeEnum, TypeError},
+    typing::{TypeEnum, TypeError},
 };
 
 mod lvalue;

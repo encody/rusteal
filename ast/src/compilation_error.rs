@@ -1,4 +1,4 @@
-use crate::{context::CompilationBinding, type_enum::TypeError};
+use crate::{context::CompilationBinding, typing::TypeError};
 use std::string::FromUtf8Error;
 
 use thiserror::Error;

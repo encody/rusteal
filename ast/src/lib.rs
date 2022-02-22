@@ -8,7 +8,7 @@ pub mod expression;
 pub mod label;
 pub mod program;
 pub mod struct_def;
-pub mod type_enum;
+pub mod typing;
 
 #[cfg(test)]
 mod tests {
