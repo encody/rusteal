@@ -1,3 +1,5 @@
+use strum_macros::EnumString;
+
 use crate::{
     compilation_error::CompilationError,
     context::{CompilationContext, TypeContext},
@@ -7,6 +9,7 @@ use crate::{
 
 use super::Expression;
 
+#[derive(Debug, Clone, PartialEq, EnumString)]
 pub enum Ret {
     Approve,
     Reject,

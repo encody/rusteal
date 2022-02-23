@@ -7,18 +7,19 @@ use crate::{
     OP_SEPARATOR,
 };
 
-use super::{primitive::Primitive, Expression};
+use super::{primitive::Primitive, Expr, Expression};
 
+#[derive(Debug, Clone, PartialEq)]
 pub enum Bind {
     Let {
         identifier: String,
-        value: Box<dyn Expression>,
-        body: Box<dyn Expression>,
+        value: Box<Expr>,
+        body: Box<Expr>,
     },
     Const {
         identifier: String,
-        value: Box<Primitive>,
-        body: Box<dyn Expression>,
+        value: Primitive,
+        body: Box<Expr>,
     },
 }
 
@@ -98,13 +99,14 @@ impl Expression for Bind {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
     use crate::{
         context::TypeContext,
         expression::{
             apply::Apply,
             binary::Binary,
             primitive::Primitive,
-            var::{Rvalue, Var},
+            var::{RVal, Var},
             Expression,
         },
     };
@@ -115,14 +117,14 @@ mod tests {
     fn test() {
         let e = Bind::Let {
             identifier: "x".to_string(),
-            value: Box::new(Primitive::UInt64(5)),
-            body: Box::new(Apply(
-                Box::new(Apply(
-                    Box::new(Binary::Equals),
-                    Box::new(Primitive::UInt64(5)),
-                )),
-                Box::new(Rvalue(Var::Bind("x".to_string()))),
-            )),
+            value: Box::new(Expr::Primitive(Primitive::UInt64(5))),
+            body: Box::new(Expr::Apply(Apply(
+                Box::new(Expr::Apply(Apply(
+                    Box::new(Expr::Binary(Binary::Equals)),
+                    Box::new(Expr::Primitive(Primitive::UInt64(5))),
+                ))),
+                Box::new(Expr::RVal(RVal(Var::Bind("x".to_string())))),
+            ))),
         };
         println!("{:?}", e.resolve(&TypeContext::default()));
         println!("{}", e.compile_raw().unwrap());

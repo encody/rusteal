@@ -9,7 +9,7 @@ use crate::{
 use super::Expression;
 
 // TODO: Incomplete
-#[derive(Debug, EnumString)]
+#[derive(Debug, Clone, PartialEq, EnumString)]
 pub enum Txn {
     Sender,
     Fee,

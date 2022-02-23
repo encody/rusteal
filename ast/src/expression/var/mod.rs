@@ -3,12 +3,13 @@ use crate::{
     typing::{TypeEnum, TypeError},
 };
 
-mod lvalue;
-pub use lvalue::Lvalue;
-mod rvalue;
-pub use rvalue::Rvalue;
+mod lval;
+mod rval;
 
-#[derive(Debug, Clone)]
+pub use lval::LVal;
+pub use rval::RVal;
+
+#[derive(Debug, Clone, PartialEq)]
 pub enum Var {
     Bind(String),
     Global(String),
