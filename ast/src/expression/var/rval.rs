@@ -8,9 +8,9 @@ use crate::{
 
 use super::Var;
 
-pub struct Rvalue(pub Var);
+pub struct RVal(pub Var);
 
-impl Expression for Rvalue {
+impl Expression for RVal {
     fn resolve(&self, context: &TypeContext) -> Result<TypeEnum, TypeError> {
         let type_enum = self.0.get_type(context)?;
 

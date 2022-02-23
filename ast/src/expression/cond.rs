@@ -6,11 +6,11 @@ use crate::{
     OP_SEPARATOR,
 };
 
-use super::Expression;
+use super::{Expression, Expr};
 
 pub struct Cond(
-    pub Box<dyn Expression>,
-    pub Box<dyn Expression>,
+    pub Box<Expr>,
+    pub Box<Expr>,
     pub Option<Box<Self>>,
 );
 
@@ -57,6 +57,7 @@ impl Expression for Cond {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
     use crate::{
         context::TypeContext,
         expression::{cond::Cond, primitive::Primitive, Expression},
@@ -65,11 +66,11 @@ mod tests {
     #[test]
     fn test() {
         let prog = Cond(
-            Box::new(Primitive::UInt64(0)),
-            Box::new(Primitive::Byteslice(b"hello".to_vec())),
+            Box::new(Expr::Primitive(Primitive::UInt64(0))),
+            Box::new(Expr::Primitive(Primitive::Byteslice(b"hello".to_vec()))),
             Some(Box::new(Cond(
-                Box::new(Primitive::UInt64(1)),
-                Box::new(Primitive::UInt64(6)),
+                Box::new(Expr::Primitive(Primitive::UInt64(1))),
+                Box::new(Expr::Primitive(Primitive::UInt64(6))),
                 None,
             ))),
         );

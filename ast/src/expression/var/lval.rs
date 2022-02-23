@@ -8,9 +8,9 @@ use crate::{
 
 use super::Var;
 
-pub struct Lvalue(pub Var);
+pub struct LVal(pub Var);
 
-impl Expression for Lvalue {
+impl Expression for LVal {
     fn resolve(&self, context: &TypeContext) -> Result<TypeEnum, TypeError> {
         let type_enum = self.0.get_type(context)?;
 
@@ -80,17 +80,17 @@ mod tests {
 
     use crate::{
         context::{CompilationBinding, CompilationContext, Scope, TypeContext},
-        expression::{apply::Apply, primitive::Primitive, var::Var, Expression},
+        expression::{apply::Apply, primitive::Primitive, var::Var, Expression, Expr},
         typing::{TypeEnum, TypePrimitive},
     };
 
-    use super::Lvalue;
+    use super::LVal;
 
     #[test]
     fn test_scratch() {
         let e = Apply(
-            Box::new(Lvalue(Var::Bind("key".to_string()))),
-            Box::new(Primitive::Byteslice("value".as_bytes().to_vec())),
+            Box::new(Expr::LVal(LVal(Var::Bind("key".to_string())))),
+            Box::new(Expr::Primitive(Primitive::Byteslice("value".as_bytes().to_vec()))),
         );
         println!(
             "{:?}",
@@ -120,8 +120,8 @@ mod tests {
     #[test]
     fn test_global() {
         let e = Apply(
-            Box::new(Lvalue(Var::Global("key".to_string()))),
-            Box::new(Primitive::Byteslice("value".as_bytes().to_vec())),
+            Box::new(Expr::LVal(LVal(Var::Global("key".to_string())))),
+            Box::new(Expr::Primitive(Primitive::Byteslice("value".as_bytes().to_vec()))),
         );
         println!(
             "{:?}",
@@ -140,11 +140,11 @@ mod tests {
     #[test]
     fn test_local() {
         let e = Apply(
-            Box::new(Apply(
-                Box::new(Lvalue(Var::Local("key".to_string()))),
-                Box::new(Primitive::UInt64(0)),
-            )),
-            Box::new(Primitive::Byteslice("value".as_bytes().to_vec())),
+            Box::new(Expr::Apply(Apply(
+                Box::new(Expr::LVal(LVal(Var::Local("key".to_string())))),
+                Box::new(Expr::Primitive(Primitive::UInt64(0))),
+            ))),
+            Box::new(Expr::Primitive(Primitive::Byteslice("value".as_bytes().to_vec()))),
         );
         println!(
             "{:?}",

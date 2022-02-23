@@ -5,10 +5,11 @@ use crate::{
     typing::{TypeEnum, TypeError},
 };
 
-mod lvalue;
-pub use lvalue::Lvalue;
-mod rvalue;
-pub use rvalue::Rvalue;
+mod lval;
+mod rval;
+
+pub use lval::LVal;
+pub use rval::RVal;
 
 #[derive(Debug, Clone)]
 pub enum Var {

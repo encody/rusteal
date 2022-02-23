@@ -4,9 +4,9 @@ use crate::{
     typing::{TypeEnum, TypeError},
 };
 
-use super::Expression;
+use super::{Expr, Expression};
 
-pub struct Apply(pub Box<dyn Expression>, pub Box<dyn Expression>);
+pub struct Apply(pub Box<Expr>, pub Box<Expr>);
 
 impl Expression for Apply {
     fn resolve(&self, context: &TypeContext) -> Result<TypeEnum, TypeError> {

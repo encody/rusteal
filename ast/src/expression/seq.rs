@@ -5,9 +5,9 @@ use crate::{
     OP_SEPARATOR,
 };
 
-use super::Expression;
+use super::{Expr, Expression};
 
-pub struct Seq(pub Box<dyn Expression>, pub Option<Box<dyn Expression>>);
+pub struct Seq(pub Box<Expr>, pub Option<Box<Expr>>);
 
 impl Expression for Seq {
     fn resolve(&self, context: &TypeContext) -> Result<TypeEnum, TypeError> {
