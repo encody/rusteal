@@ -26,12 +26,12 @@ mod tests {
     fn test_seq_int_bytes() {
         let compiled = Program {
             version: 5,
-            body: Box::new(Expr::Seq(Seq(
+            body: Expr::Seq(Seq(
                 Box::new(Expr::Primitive(Primitive::UInt64(5))),
                 Some(Box::new(Expr::Primitive(Primitive::Byteslice(
                     b"test".to_vec(),
                 )))),
-            ))),
+            )),
         }
         .compile();
         println!("{}", compiled.unwrap());
@@ -41,7 +41,7 @@ mod tests {
     fn test_types() {
         let program = Program {
             version: 5,
-            body: Box::new(Expr::Seq(Seq(
+            body: Expr::Seq(Seq(
                 Box::new(Expr::Apply(Apply(
                     Box::new(Expr::Apply(Apply(
                         Box::new(Expr::Binary(Binary::Equals)),
@@ -65,7 +65,7 @@ mod tests {
                         Box::new(Expr::Primitive(Primitive::Byteslice(b"testagain".to_vec()))),
                     )))),
                 )))),
-            ))),
+            )),
         };
         println!("{:?}", program.type_check().unwrap());
         println!("{}", program.compile().unwrap());
@@ -75,7 +75,7 @@ mod tests {
     fn main_conditional() {
         let program = Program {
             version: 5,
-            body: Box::new(Expr::Seq(Seq(
+            body: Expr::Seq(Seq(
                 Box::new(Expr::Cond(Cond(
                     Box::new(Expr::Apply(Apply(
                         Box::new(Expr::Apply(Apply(
@@ -98,7 +98,7 @@ mod tests {
                     ))),
                 ))),
                 None,
-            ))),
+            )),
         };
         println!("{:?}", program.type_check().unwrap());
         println!("{}", program.compile().unwrap());
