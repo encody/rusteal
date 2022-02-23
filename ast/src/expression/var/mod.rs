@@ -11,7 +11,7 @@ mod rval;
 pub use lval::LVal;
 pub use rval::RVal;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Var {
     Bind(String),
     Global(String),

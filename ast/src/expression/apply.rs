@@ -6,6 +6,7 @@ use crate::{
 
 use super::{Expr, Expression};
 
+#[derive(Debug, Clone, PartialEq)]
 pub struct Apply(pub Box<Expr>, pub Box<Expr>);
 
 impl Expression for Apply {

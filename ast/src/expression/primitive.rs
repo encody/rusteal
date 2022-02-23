@@ -8,7 +8,7 @@ use crate::{
 
 use super::Expression;
 
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Primitive {
     UInt64(u64),
     Byteslice(Vec<u8>),

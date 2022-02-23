@@ -6,7 +6,7 @@ use crate::{
 
 use super::Expression;
 
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum OnComplete {
     NoOp,
     OptIn,

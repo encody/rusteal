@@ -7,6 +7,7 @@ use crate::{
 
 use super::Expression;
 
+#[derive(Debug, Clone, PartialEq)]
 pub enum Binary {
     Equals,
     NotEquals,

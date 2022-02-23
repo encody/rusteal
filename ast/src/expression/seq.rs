@@ -7,6 +7,7 @@ use crate::{
 
 use super::{Expr, Expression};
 
+#[derive(Debug, Clone, PartialEq)]
 pub struct Seq(pub Box<Expr>, pub Option<Box<Expr>>);
 
 impl Expression for Seq {

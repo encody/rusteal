@@ -15,6 +15,7 @@ pub mod seq;
 pub mod txn;
 pub mod var;
 
+#[derive(Debug, Clone, PartialEq)]
 pub enum Expr {
 	Apply(apply::Apply),
 	Binary(binary::Binary),

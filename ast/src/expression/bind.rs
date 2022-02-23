@@ -9,6 +9,7 @@ use crate::{
 
 use super::{primitive::Primitive, Expr, Expression};
 
+#[derive(Debug, Clone, PartialEq)]
 pub enum Bind {
     Let {
         identifier: String,

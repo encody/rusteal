@@ -8,6 +8,7 @@ use crate::{
 
 use super::{Expression, Expr};
 
+#[derive(Debug, Clone, PartialEq)]
 pub struct Cond(
     pub Box<Expr>,
     pub Box<Expr>,

@@ -8,6 +8,7 @@ use crate::{
 
 use super::Var;
 
+#[derive(Debug, Clone, PartialEq)]
 pub struct LVal(pub Var);
 
 impl Expression for LVal {
