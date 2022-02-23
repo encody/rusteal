@@ -8,7 +8,7 @@ use crate::{
 use super::{Expr, Expression};
 
 #[derive(Debug, Clone, PartialEq)]
-pub struct Seq(pub Box<Expr>, pub Option<Box<Expr>>);
+pub struct Seq(pub Expr, pub Option<Expr>);
 
 impl Expression for Seq {
     fn resolve(&self, context: &TypeContext) -> Result<TypeEnum, TypeError> {

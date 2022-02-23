@@ -7,12 +7,12 @@ use crate::{
 use super::{Expr, Expression};
 
 #[derive(Debug, Clone, PartialEq)]
-pub struct Apply(pub Box<Expr>, pub Box<Expr>);
+pub struct Apply(pub Expr, pub Expr);
 
 impl Expression for Apply {
     fn resolve(&self, context: &TypeContext) -> Result<TypeEnum, TypeError> {
-        let mut f_type = (*self.0).resolve(context)?;
-        let mut arg_type = (*self.1).resolve(context)?;
+        let mut f_type = self.0.resolve(context)?;
+        let mut arg_type = self.1.resolve(context)?;
         match f_type {
             TypeEnum::Arrow(ref mut param_type, body_type) => {
                 param_type.unify(&mut arg_type)?;

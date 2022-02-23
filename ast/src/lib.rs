@@ -26,12 +26,10 @@ mod tests {
     fn test_seq_int_bytes() {
         let compiled = Program {
             version: 5,
-            body: Expr::Seq(Seq(
-                Box::new(Expr::Primitive(Primitive::UInt64(5))),
-                Some(Box::new(Expr::Primitive(Primitive::Byteslice(
-                    b"test".to_vec(),
-                )))),
-            )),
+            body: Expr::Seq(Box::new(Seq(
+                Expr::Primitive(Primitive::UInt64(5)),
+                Some(Expr::Primitive(Primitive::Byteslice(b"test".to_vec()))),
+            ))),
         }
         .compile();
         println!("{}", compiled.unwrap());
@@ -41,31 +39,31 @@ mod tests {
     fn test_types() {
         let program = Program {
             version: 5,
-            body: Expr::Seq(Seq(
-                Box::new(Expr::Apply(Apply(
-                    Box::new(Expr::Apply(Apply(
-                        Box::new(Expr::Binary(Binary::Equals)),
-                        Box::new(Expr::Primitive(Primitive::UInt64(5))),
+            body: Expr::Seq(Box::new(Seq(
+                Expr::Apply(Box::new(Apply(
+                    Expr::Apply(Box::new(Apply(
+                        Expr::Binary(Binary::Equals),
+                        Expr::Primitive(Primitive::UInt64(5)),
                     ))),
-                    Box::new(Expr::Primitive(Primitive::UInt64(5))),
+                    Expr::Primitive(Primitive::UInt64(5)),
                 ))),
-                Some(Box::new(Expr::Seq(Seq(
-                    Box::new(Expr::Apply(Apply(
-                        Box::new(Expr::Apply(Apply(
-                            Box::new(Expr::Binary(Binary::GreaterThan)),
-                            Box::new(Expr::Primitive(Primitive::UInt64(5))),
+                Some(Expr::Seq(Box::new(Seq(
+                    Expr::Apply(Box::new(Apply(
+                        Expr::Apply(Box::new(Apply(
+                            Expr::Binary(Binary::GreaterThan),
+                            Expr::Primitive(Primitive::UInt64(5)),
                         ))),
-                        Box::new(Expr::Primitive(Primitive::UInt64(6))),
+                        Expr::Primitive(Primitive::UInt64(6)),
                     ))),
-                    Some(Box::new(Expr::Apply(Apply(
-                        Box::new(Expr::Apply(Apply(
-                            Box::new(Expr::Binary(Binary::NotEquals)),
-                            Box::new(Expr::Primitive(Primitive::Byteslice(b"test".to_vec()))),
+                    Some(Expr::Apply(Box::new(Apply(
+                        Expr::Apply(Box::new(Apply(
+                            Expr::Binary(Binary::NotEquals),
+                            Expr::Primitive(Primitive::Byteslice(b"test".to_vec())),
                         ))),
-                        Box::new(Expr::Primitive(Primitive::Byteslice(b"testagain".to_vec()))),
+                        Expr::Primitive(Primitive::Byteslice(b"testagain".to_vec())),
                     )))),
                 )))),
-            )),
+            ))),
         };
         println!("{:?}", program.type_check().unwrap());
         println!("{}", program.compile().unwrap());
@@ -75,30 +73,30 @@ mod tests {
     fn main_conditional() {
         let program = Program {
             version: 5,
-            body: Expr::Seq(Seq(
-                Box::new(Expr::Cond(Cond(
-                    Box::new(Expr::Apply(Apply(
-                        Box::new(Expr::Apply(Apply(
-                            Box::new(Expr::Binary(Binary::Equals)),
-                            Box::new(Expr::Primitive(Primitive::UInt64(0))),
+            body: Expr::Seq(Box::new(Seq(
+                Expr::Cond(Box::new(Cond(
+                    Expr::Apply(Box::new(Apply(
+                        Expr::Apply(Box::new(Apply(
+                            Expr::Binary(Binary::Equals),
+                            Expr::Primitive(Primitive::UInt64(0)),
                         ))),
-                        Box::new(Expr::Txn(Txn::ApplicationID)),
+                        Expr::Txn(Txn::ApplicationID),
                     ))),
-                    Box::new(Expr::Primitive(Primitive::Byteslice(b"init".to_vec()))),
+                    Expr::Primitive(Primitive::Byteslice(b"init".to_vec())),
                     Some(Box::new(Cond(
-                        Box::new(Expr::Apply(Apply(
-                            Box::new(Expr::Apply(Apply(
-                                Box::new(Expr::Binary(Binary::Equals)),
-                                Box::new(Expr::OnComplete(OnComplete::NoOp)),
+                        Expr::Apply(Box::new(Apply(
+                            Expr::Apply(Box::new(Apply(
+                                Expr::Binary(Binary::Equals),
+                                Expr::OnComplete(OnComplete::NoOp),
                             ))),
-                            Box::new(Expr::Txn(Txn::OnCompletion)),
+                            Expr::Txn(Txn::OnCompletion),
                         ))),
-                        Box::new(Expr::Primitive(Primitive::Byteslice(b"noop".to_vec()))),
+                        Expr::Primitive(Primitive::Byteslice(b"noop".to_vec())),
                         None,
                     ))),
                 ))),
                 None,
-            )),
+            ))),
         };
         println!("{:?}", program.type_check().unwrap());
         println!("{}", program.compile().unwrap());

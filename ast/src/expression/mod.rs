@@ -17,14 +17,14 @@ pub mod var;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Expr {
-    Apply(apply::Apply),
+    Apply(Box<apply::Apply>),
     Binary(binary::Binary),
-    Bind(bind::Bind),
-    Cond(cond::Cond),
+    Bind(Box<bind::Bind>),
+    Cond(Box<cond::Cond>),
     OnComplete(constant::OnComplete),
     Primitive(primitive::Primitive),
     Ret(ret::Ret),
-    Seq(seq::Seq),
+    Seq(Box<seq::Seq>),
     Txn(txn::Txn),
     LVal(var::LVal),
     RVal(var::RVal),
