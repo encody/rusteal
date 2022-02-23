@@ -81,7 +81,7 @@ mod tests {
 
     use crate::{
         context::{CompilationBinding, CompilationContext, Scope, TypeContext},
-        expression::{apply::Apply, primitive::Primitive, var::Var, Expression, Expr},
+        expression::{apply::Apply, primitive::Primitive, var::Var, Expr, Expression},
         typing::{TypeEnum, TypePrimitive},
     };
 
@@ -91,7 +91,9 @@ mod tests {
     fn test_scratch() {
         let e = Apply(
             Box::new(Expr::LVal(LVal(Var::Bind("key".to_string())))),
-            Box::new(Expr::Primitive(Primitive::Byteslice("value".as_bytes().to_vec()))),
+            Box::new(Expr::Primitive(Primitive::Byteslice(
+                "value".as_bytes().to_vec(),
+            ))),
         );
         println!(
             "{:?}",
@@ -122,7 +124,9 @@ mod tests {
     fn test_global() {
         let e = Apply(
             Box::new(Expr::LVal(LVal(Var::Global("key".to_string())))),
-            Box::new(Expr::Primitive(Primitive::Byteslice("value".as_bytes().to_vec()))),
+            Box::new(Expr::Primitive(Primitive::Byteslice(
+                "value".as_bytes().to_vec(),
+            ))),
         );
         println!(
             "{:?}",
@@ -145,7 +149,9 @@ mod tests {
                 Box::new(Expr::LVal(LVal(Var::Local("key".to_string())))),
                 Box::new(Expr::Primitive(Primitive::UInt64(0))),
             ))),
-            Box::new(Expr::Primitive(Primitive::Byteslice("value".as_bytes().to_vec()))),
+            Box::new(Expr::Primitive(Primitive::Byteslice(
+                "value".as_bytes().to_vec(),
+            ))),
         );
         println!(
             "{:?}",

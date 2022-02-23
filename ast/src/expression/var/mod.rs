@@ -1,5 +1,3 @@
-
-   
 use crate::{
     context::TypeContext,
     typing::{TypeEnum, TypeError},

@@ -6,14 +6,10 @@ use crate::{
     OP_SEPARATOR,
 };
 
-use super::{Expression, Expr};
+use super::{Expr, Expression};
 
 #[derive(Debug, Clone, PartialEq)]
-pub struct Cond(
-    pub Box<Expr>,
-    pub Box<Expr>,
-    pub Option<Box<Self>>,
-);
+pub struct Cond(pub Box<Expr>, pub Box<Expr>, pub Option<Box<Self>>);
 
 impl Expression for Cond {
     fn resolve(&self, context: &TypeContext) -> Result<TypeEnum, TypeError> {

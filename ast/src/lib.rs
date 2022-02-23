@@ -12,7 +12,6 @@ pub mod typing;
 
 #[cfg(test)]
 mod tests {
-    use crate::expression::Expr;
     use crate::expression::apply::Apply;
     use crate::expression::binary::Binary;
     use crate::expression::cond::Cond;
@@ -20,6 +19,7 @@ mod tests {
     use crate::expression::primitive::Primitive;
     use crate::expression::seq::Seq;
     use crate::expression::txn::Txn;
+    use crate::expression::Expr;
     use crate::program::Program;
 
     #[test]
@@ -28,7 +28,9 @@ mod tests {
             version: 5,
             body: Box::new(Expr::Seq(Seq(
                 Box::new(Expr::Primitive(Primitive::UInt64(5))),
-                Some(Box::new(Expr::Primitive(Primitive::Byteslice(b"test".to_vec())))),
+                Some(Box::new(Expr::Primitive(Primitive::Byteslice(
+                    b"test".to_vec(),
+                )))),
             ))),
         }
         .compile();
@@ -85,7 +87,10 @@ mod tests {
                     Box::new(Expr::Primitive(Primitive::Byteslice(b"init".to_vec()))),
                     Some(Box::new(Cond(
                         Box::new(Expr::Apply(Apply(
-                            Box::new(Expr::Apply(Apply(Box::new(Expr::Binary(Binary::Equals)), Box::new(Expr::OnComplete(OnComplete::NoOp))))),
+                            Box::new(Expr::Apply(Apply(
+                                Box::new(Expr::Binary(Binary::Equals)),
+                                Box::new(Expr::OnComplete(OnComplete::NoOp)),
+                            ))),
                             Box::new(Expr::Txn(Txn::OnCompletion)),
                         ))),
                         Box::new(Expr::Primitive(Primitive::Byteslice(b"noop".to_vec()))),

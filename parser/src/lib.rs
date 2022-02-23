@@ -155,7 +155,7 @@ fn parse_expression(pair1: Pair<Rule>) -> Result<Box<dyn Expression>, ParseError
             if let Some(bin_pair) = bin_pair {
                 match bin_pair {
                     // Rule::binary_operation => {}
-                    _ => todo!()
+                    _ => todo!(),
                 }
             }
 
