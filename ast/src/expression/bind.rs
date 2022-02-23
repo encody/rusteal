@@ -13,13 +13,13 @@ use super::{primitive::Primitive, Expr, Expression};
 pub enum Bind {
     Let {
         identifier: String,
-        value: Box<Expr>,
-        body: Box<Expr>,
+        value: Expr,
+        body: Expr,
     },
     Const {
         identifier: String,
         value: Primitive,
-        body: Box<Expr>,
+        body: Expr,
     },
 }
 
@@ -117,13 +117,13 @@ mod tests {
     fn test() {
         let e = Bind::Let {
             identifier: "x".to_string(),
-            value: Box::new(Expr::Primitive(Primitive::UInt64(5))),
-            body: Box::new(Expr::Apply(Apply(
-                Box::new(Expr::Apply(Apply(
-                    Box::new(Expr::Binary(Binary::Equals)),
-                    Box::new(Expr::Primitive(Primitive::UInt64(5))),
+            value: Expr::Primitive(Primitive::UInt64(5)),
+            body: Expr::Apply(Box::new(Apply(
+                Expr::Apply(Box::new(Apply(
+                    Expr::Binary(Binary::Equals),
+                    Expr::Primitive(Primitive::UInt64(5)),
                 ))),
-                Box::new(Expr::RVal(RVal(Var::Bind("x".to_string())))),
+                Expr::RVal(RVal(Var::Bind("x".to_string()))),
             ))),
         };
         println!("{:?}", e.resolve(&TypeContext::default()));

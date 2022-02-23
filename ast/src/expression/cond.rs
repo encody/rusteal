@@ -9,7 +9,7 @@ use crate::{
 use super::{Expr, Expression};
 
 #[derive(Debug, Clone, PartialEq)]
-pub struct Cond(pub Box<Expr>, pub Box<Expr>, pub Option<Box<Self>>);
+pub struct Cond(pub Expr, pub Expr, pub Option<Box<Self>>);
 
 impl Expression for Cond {
     fn resolve(&self, context: &TypeContext) -> Result<TypeEnum, TypeError> {
@@ -63,11 +63,11 @@ mod tests {
     #[test]
     fn test() {
         let prog = Cond(
-            Box::new(Expr::Primitive(Primitive::UInt64(0))),
-            Box::new(Expr::Primitive(Primitive::Byteslice(b"hello".to_vec()))),
+            Expr::Primitive(Primitive::UInt64(0)),
+            Expr::Primitive(Primitive::Byteslice(b"hello".to_vec())),
             Some(Box::new(Cond(
-                Box::new(Expr::Primitive(Primitive::UInt64(1))),
-                Box::new(Expr::Primitive(Primitive::UInt64(6))),
+                Expr::Primitive(Primitive::UInt64(1)),
+                Expr::Primitive(Primitive::UInt64(6)),
                 None,
             ))),
         );

@@ -90,10 +90,8 @@ mod tests {
     #[test]
     fn test_scratch() {
         let e = Apply(
-            Box::new(Expr::LVal(LVal(Var::Bind("key".to_string())))),
-            Box::new(Expr::Primitive(Primitive::Byteslice(
-                "value".as_bytes().to_vec(),
-            ))),
+            Expr::LVal(LVal(Var::Bind("key".to_string()))),
+            Expr::Primitive(Primitive::Byteslice("value".as_bytes().to_vec())),
         );
         println!(
             "{:?}",
@@ -123,10 +121,8 @@ mod tests {
     #[test]
     fn test_global() {
         let e = Apply(
-            Box::new(Expr::LVal(LVal(Var::Global("key".to_string())))),
-            Box::new(Expr::Primitive(Primitive::Byteslice(
-                "value".as_bytes().to_vec(),
-            ))),
+            Expr::LVal(LVal(Var::Global("key".to_string()))),
+            Expr::Primitive(Primitive::Byteslice("value".as_bytes().to_vec())),
         );
         println!(
             "{:?}",
@@ -145,13 +141,11 @@ mod tests {
     #[test]
     fn test_local() {
         let e = Apply(
-            Box::new(Expr::Apply(Apply(
-                Box::new(Expr::LVal(LVal(Var::Local("key".to_string())))),
-                Box::new(Expr::Primitive(Primitive::UInt64(0))),
+            Expr::Apply(Box::new(Apply(
+                Expr::LVal(LVal(Var::Local("key".to_string()))),
+                Expr::Primitive(Primitive::UInt64(0)),
             ))),
-            Box::new(Expr::Primitive(Primitive::Byteslice(
-                "value".as_bytes().to_vec(),
-            ))),
+            Expr::Primitive(Primitive::Byteslice("value".as_bytes().to_vec())),
         );
         println!(
             "{:?}",
