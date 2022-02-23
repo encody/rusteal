@@ -57,9 +57,10 @@ impl Expression for Primitive {
             Self::Byteslice(value) => {
                 let escaped = String::from_utf8(
                     value
-                        .into_iter()
-                        .flat_map(|c| ascii::escape_default(*c))
-                        .collect::<Vec<u8>>(),
+                        .to_vec()
+                        // .into_iter()
+                        // .flat_map(|c| ascii::escape_default(*c))
+                        // .collect::<Vec<u8>>(),
                 )?;
 
                 Ok(format!("byte \"{escaped}\""))
