@@ -6,6 +6,7 @@ pub mod context;
 pub mod contract;
 pub mod expression;
 pub mod label;
+pub mod macros;
 pub mod program;
 pub mod struct_def;
 pub mod typing;

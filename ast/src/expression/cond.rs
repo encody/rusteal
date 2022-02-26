@@ -9,7 +9,7 @@ use crate::{
 use super::{Expr, Expression};
 
 #[derive(Debug, Clone, PartialEq)]
-pub struct Cond(pub Expr, pub Expr, pub Option<Box<Self>>);
+pub struct Cond(pub Expr, pub Expr, pub Option<Box<Cond>>);
 
 impl Expression for Cond {
     fn resolve(&self, context: &TypeContext) -> Result<TypeEnum, TypeError> {
