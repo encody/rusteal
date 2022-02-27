@@ -9,6 +9,7 @@ pub mod binary;
 pub mod bind;
 pub mod cond;
 pub mod constant;
+pub mod if_else;
 pub mod primitive;
 pub mod ret;
 pub mod seq;
@@ -22,6 +23,7 @@ pub enum Expr {
     Bind(Box<bind::Bind>),
     Cond(Box<cond::Cond>),
     OnComplete(constant::OnComplete),
+    If(Box<if_else::If>),
     Primitive(primitive::Primitive),
     Ret(ret::Ret),
     Seq(Box<seq::Seq>),
@@ -51,6 +53,7 @@ impl Expression for Expr {
             Expr::Bind(expr) => expr.resolve(context),
             Expr::Cond(expr) => expr.resolve(context),
             Expr::OnComplete(expr) => expr.resolve(context),
+            Expr::If(expr) => expr.resolve(context),
             Expr::Primitive(expr) => expr.resolve(context),
             Expr::Ret(expr) => expr.resolve(context),
             Expr::Seq(expr) => expr.resolve(context),
@@ -70,6 +73,7 @@ impl Expression for Expr {
             Expr::Binary(expr) => expr.compile(context, prepared_stack),
             Expr::Bind(expr) => expr.compile(context, prepared_stack),
             Expr::Cond(expr) => expr.compile(context, prepared_stack),
+            Expr::If(expr) => expr.compile(context, prepared_stack),
             Expr::OnComplete(expr) => expr.compile(context, prepared_stack),
             Expr::Primitive(expr) => expr.compile(context, prepared_stack),
             Expr::Ret(expr) => expr.compile(context, prepared_stack),
