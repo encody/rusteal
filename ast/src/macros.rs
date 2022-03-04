@@ -79,7 +79,7 @@ macro_rules! binop {
 
 #[macro_export]
 macro_rules! bind_let {
-    ($i:ident = ($e:expr) in $b:expr) => {
+    ($i:ident = $e:expr; $b:expr) => {
         Expr::Bind(Box::new(Bind::Let {
             identifier: String::from(stringify!($i)),
             value: $e,
@@ -149,12 +149,23 @@ macro_rules! cond {
     }
 }
 
+#[macro_export]
+macro_rules! r#if {
+    (($e:expr) @then $true_expr:expr; @else $false_expr:expr $(;)*) => {
+        apply!(
+            @fn Expr::If(Box::new(If($true_expr, $false_expr)));
+            @arg $e;
+        )
+    };
+}
+
 #[cfg(test)]
 mod tests {
     use crate::expression::apply::Apply;
     use crate::expression::binary::Binary;
     use crate::expression::bind::Bind;
     use crate::expression::cond::Cond;
+    use crate::expression::if_else::If;
     use crate::expression::primitive::Primitive;
     use crate::expression::seq::Seq;
     use crate::expression::var::{LVal, RVal, Var};
@@ -171,13 +182,18 @@ mod tests {
         // let x = binop!((int!(2)) > (int!(1)));
         // println!("{}", x.compile_raw().unwrap());
 
-        let x = bind_let!(my_scratch = (int!(123)) in seq! {
+        let x = bind_let!(my_scratch = binop!((int!(2)) > (int!(1))); seq! {
             assign!(@local my_local[int!(0)] = int!(1));
             val!(@local my_local[int!(0)]);
             assign!(@global my_global = int!(2));
             val!(@global my_global);
             assign!(@scratch my_scratch = int!(2));
             val!(@scratch my_scratch);
+            r#if!(
+                (binop!((val!(@scratch my_scratch)) > (int!(4))))
+                @then bytes!(">4".into());
+                @else bytes!("<=4".into());
+            );
         });
         println!("{}", x.compile_raw().unwrap());
 
