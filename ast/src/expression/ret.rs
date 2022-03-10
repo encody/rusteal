@@ -34,13 +34,16 @@ impl Expression for Ret {
 mod tests {
     use crate::{
         context::TypeContext,
-        expression::{ret::Ret, Expression},
+        expression::{apply::Apply, primitive::Primitive, ret::Ret, Expr, Expression},
     };
 
     #[test]
     fn test() {
-        // let e = Ret::Approve;
-        // println!("{:?}", e.resolve(&TypeContext::default()));
-        // println!("{}", e.compile_raw().unwrap());
+        let e = Expr::Apply(Box::new(Apply(
+            Expr::Ret(Ret),
+            Expr::Primitive(Primitive::UInt64(1)),
+        )));
+        println!("{:?}", e.resolve(&TypeContext::default()));
+        println!("{}", e.compile_raw().unwrap());
     }
 }
