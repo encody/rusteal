@@ -65,6 +65,9 @@ macro_rules! binop {
     (($a:expr) == ($b:expr)) => {
         apply!(@fn Expr::Binary(Binary::Equals); @arg $b; @arg $a)
     };
+    (($a:expr) != ($b:expr)) => {
+        apply!(@fn Expr::Binary(Binary::NotEquals); @arg $b; @arg $a)
+    };
     (($a:expr) > ($b:expr)) => {
         apply!(@fn Expr::Binary(Binary::GreaterThan); @arg $b; @arg $a)
     };
@@ -254,8 +257,8 @@ macro_rules! typesig {
             // This is less efficient than writing the type by hand
             // Another possible option:
             // https://stackoverflow.com/a/64957454 (generate custom struct with fields for each unique tvar?)
-            let mut tvars: std::collections::HashMap<&'static str, TypeVar> = std::collections::HashMap::new();
-            typesig!(@_context tvars $a $($b)+)
+            let mut _tvars: std::collections::HashMap<&'static str, TypeVar> = std::collections::HashMap::new();
+            typesig!(@_context _tvars $a $($b)+)
         }
     };
 }
