@@ -2,6 +2,8 @@
 
 // trace_macros!(true);
 
+use crate::typing::TypeVar;
+
 #[macro_export]
 macro_rules! int {
     ($e: expr) => {
@@ -158,6 +160,7 @@ macro_rules! r#if {
         )
     };
 }
+
 #[macro_export]
 macro_rules! ret {
     ($e:expr) => {
@@ -165,6 +168,95 @@ macro_rules! ret {
             @fn Expr::Ret(Ret);
             @arg $e;
         )
+    };
+}
+
+#[macro_export]
+/// Type signatures may be written using the syntax:
+/// 
+/// ```rs
+/// typesig!(<typesig>)
+/// ```
+/// 
+/// where
+/// 
+/// ```txt
+///     <typesig> ::
+///           <simpletype>
+///         | <simpletype> -> <typesig>
+/// 
+///     <simpletype> ::
+///           <typekw>
+///         | :<typevar>
+/// 
+///     <typekw> ::
+///           int
+///         | bytes
+///         | void
+///         | halt
+/// 
+///     <typevar> ::
+///         (any identifier that does not match <typekw>)
+/// ```
+/// 
+/// Examples:
+/// 
+/// ```rs
+/// typesig!(int);
+/// typesig!(bytes);
+/// typesig!(bytes -> int);
+/// typesig!(:a -> int);
+/// typesig!(:a -> :a);
+/// typesig!(:a -> :b);
+/// typesig!(:a -> :b -> :a -> :c -> int);
+/// ```
+/// 
+/// Function parameter syntax (e.g. `:a -> (:b -> :c) -> :d`) is not supported
+macro_rules! typesig {
+    ($(@_context $t:ident)? int) => {
+        TypeEnum::Simple(TypePrimitive::UInt64)
+    };
+    ($(@_context $t:ident)? bytes) => {
+        TypeEnum::Simple(TypePrimitive::Byteslice)
+    };
+    ($(@_context $t:ident)? void) => {
+        TypeEnum::Simple(TypePrimitive::Void)
+    };
+    ($(@_context $t:ident)? halt) => {
+        TypeEnum::Simple(TypePrimitive::Halt)
+    };
+    ($(:)? $a:ident) => {
+        TypeEnum::Var(TypeVar::new())
+    };
+    (@get_tvar $t:ident $i:ident) => {
+        {
+            let i = stringify!($i);
+            if $t.contains_key(&i) {
+                TypeEnum::Var($t[&i].clone())
+            } else {
+                let tv = TypeVar::new();
+                $t.insert(i, tv.clone());
+                TypeEnum::Var(tv)
+            }
+        }
+    };
+    (@_context $t:ident $(:)? $a:ident) => {
+        typesig!(@get_tvar $t $a)
+    };
+    (@_context $t:ident $(:)? $a:ident $($(->)? $(:)? $b:ident)+) => {
+        TypeEnum::Arrow(
+            Box::new(typesig!(@_context $t $a)),
+            Box::new(typesig!(@_context $t $($b)+)),
+        )
+    };
+    ($(:)? $a:ident $(-> $(:)? $b:ident)+) => {
+        {
+            // This is less efficient than writing the type by hand
+            // Another possible option:
+            // https://stackoverflow.com/a/64957454 (generate custom struct with fields for each unique tvar?)
+            let mut tvars: std::collections::HashMap<&'static str, TypeVar> = std::collections::HashMap::new();
+            typesig!(@_context tvars $a $($b)+)
+        }
     };
 }
 
@@ -180,6 +272,19 @@ mod tests {
     use crate::expression::seq::Seq;
     use crate::expression::var::{LVal, RVal, Var};
     use crate::expression::{Expr, Expression};
+    use crate::typing::{TypeEnum, TypeVar, TypePrimitive};
+
+    #[test]
+    fn test_typesig() {
+        let mut t = typesig!(:a -> :a -> :b -> int);
+        let mut t2 = typesig!(:c -> :c -> :asdf -> int);
+        let expected = "'a -> 'a -> 'b -> int";
+        println!("{}", t);
+        println!("{}", t2);
+        assert_eq!(format!("{}", t), expected);
+        assert_eq!(format!("{}", t2), expected);
+        t.unify(&mut t2).expect("Types are unifiable");
+    }
 
     #[test]
     fn test() {
