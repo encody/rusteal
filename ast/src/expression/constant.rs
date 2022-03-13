@@ -1,7 +1,7 @@
 use crate::{
     compilation_error::CompilationError,
     context::{CompilationContext, TypeContext},
-    typing::{TypeEnum, TypeError, TypePrimitive},
+    typing::{TypeEnum, TypeError, TypePrimitive}, typesig,
 };
 
 use super::Expression;
@@ -18,7 +18,7 @@ pub enum OnComplete {
 
 impl Expression for OnComplete {
     fn resolve(&self, _: &TypeContext) -> Result<TypeEnum, TypeError> {
-        Ok(TypeEnum::Simple(TypePrimitive::UInt64))
+        Ok(typesig!(int))
     }
 
     fn compile(

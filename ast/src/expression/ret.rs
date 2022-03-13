@@ -1,7 +1,8 @@
 use crate::{
     compilation_error::CompilationError,
     context::{CompilationContext, TypeContext},
-    typing::{TypeEnum, TypeError, TypePrimitive},
+    typesig,
+    typing::{TypeEnum, TypeError, TypePrimitive, TypeVar},
     OP_SEPARATOR,
 };
 
@@ -12,10 +13,7 @@ pub struct Ret;
 
 impl Expression for Ret {
     fn resolve(&self, _: &TypeContext) -> Result<TypeEnum, TypeError> {
-        Ok(TypeEnum::Arrow(
-            Box::new(TypeEnum::Simple(TypePrimitive::UInt64)),
-            Box::new(TypeEnum::Simple(TypePrimitive::Halt)),
-        ))
+        Ok(typesig!(int -> halt))
     }
 
     fn compile(

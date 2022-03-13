@@ -1,6 +1,7 @@
 use crate::{
     compilation_error::CompilationError,
     context::{CompilationContext, TypeContext},
+    typesig,
     typing::{TypeEnum, TypeError, TypePrimitive, TypeVar},
     OP_SEPARATOR,
 };
@@ -32,25 +33,10 @@ impl Expression for Binary {
             Binary::GreaterThan
             | Binary::GreaterThanEquals
             | Binary::LessThan
-            | Binary::LessThanEquals => TypeEnum::Arrow(
-                Box::new(TypeEnum::Simple(TypePrimitive::UInt64)),
-                Box::new(TypeEnum::Arrow(
-                    Box::new(TypeEnum::Simple(TypePrimitive::UInt64)),
-                    Box::new(TypeEnum::Simple(TypePrimitive::UInt64)),
-                )),
-            ),
+            | Binary::LessThanEquals => typesig!(int -> int -> int),
             // function binary<T>(a: T, b: T): uint;
             // 'a -> 'a -> uint
-            Binary::Equals | Binary::NotEquals => {
-                let tv = TypeVar::new();
-                TypeEnum::Arrow(
-                    Box::new(TypeEnum::Var(tv.clone())),
-                    Box::new(TypeEnum::Arrow(
-                        Box::new(TypeEnum::Var(tv.clone())),
-                        Box::new(TypeEnum::Simple(TypePrimitive::UInt64)),
-                    )),
-                )
-            }
+            Binary::Equals | Binary::NotEquals => typesig!(:a -> :a -> int),
         })
     }
 

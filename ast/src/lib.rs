@@ -15,13 +15,16 @@ pub mod typing;
 mod tests {
     use crate::expression::apply::Apply;
     use crate::expression::binary::Binary;
+    use crate::expression::bind::Bind;
     use crate::expression::cond::Cond;
     use crate::expression::constant::OnComplete;
     use crate::expression::primitive::Primitive;
+    use crate::expression::ret::Ret;
     use crate::expression::seq::Seq;
     use crate::expression::txn::Txn;
     use crate::expression::Expr;
     use crate::program::Program;
+    use crate::{apply, bind_let, binop, bytes, int, ret};
 
     #[test]
     fn test_seq_int_bytes() {
@@ -37,34 +40,19 @@ mod tests {
     }
 
     #[test]
-    fn test_types() {
+    fn let_binop_ret() {
         let program = Program {
             version: 5,
-            body: Expr::Seq(Box::new(Seq(
-                Expr::Apply(Box::new(Apply(
-                    Expr::Apply(Box::new(Apply(
-                        Expr::Binary(Binary::Equals),
-                        Expr::Primitive(Primitive::UInt64(5)),
-                    ))),
-                    Expr::Primitive(Primitive::UInt64(5)),
-                ))),
-                Some(Expr::Seq(Box::new(Seq(
-                    Expr::Apply(Box::new(Apply(
-                        Expr::Apply(Box::new(Apply(
-                            Expr::Binary(Binary::GreaterThan),
-                            Expr::Primitive(Primitive::UInt64(5)),
-                        ))),
-                        Expr::Primitive(Primitive::UInt64(6)),
-                    ))),
-                    Some(Expr::Apply(Box::new(Apply(
-                        Expr::Apply(Box::new(Apply(
-                            Expr::Binary(Binary::NotEquals),
-                            Expr::Primitive(Primitive::Byteslice(b"test".to_vec())),
-                        ))),
-                        Expr::Primitive(Primitive::Byteslice(b"testagain".to_vec())),
-                    )))),
-                )))),
-            ))),
+            body: bind_let!(
+                int_eq = binop!((int!(5)) == (int!(5)));
+                bind_let!(
+                    int_gt = binop!((int!(6)) > (int!(5)));
+                    bind_let!(
+                        bytes_ne = binop!((bytes!("testagain".into())) != (bytes!("test".into())));
+                        ret!(int!(1))
+                    )
+                )
+            ),
         };
         println!("{:?}", program.type_check().unwrap());
         println!("{}", program.compile().unwrap());

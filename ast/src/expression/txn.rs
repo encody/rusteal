@@ -3,6 +3,7 @@ use strum_macros::EnumString;
 use crate::{
     compilation_error::CompilationError,
     context::{CompilationContext, TypeContext},
+    typesig,
     typing::{TypeEnum, TypeError, TypePrimitive},
 };
 
@@ -25,12 +26,12 @@ pub enum Txn {
 
 impl Expression for Txn {
     fn resolve(&self, _: &TypeContext) -> Result<TypeEnum, TypeError> {
-        Ok(TypeEnum::Simple(match self {
+        Ok(match self {
             Txn::Sender | Txn::Receiver | Txn::CloseRemainderTo | Txn::Accounts => {
-                TypePrimitive::Byteslice
+                typesig!(bytes)
             }
-            _ => TypePrimitive::UInt64,
-        }))
+            _ => typesig!(int),
+        })
     }
 
     fn compile(

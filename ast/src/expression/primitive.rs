@@ -3,6 +3,7 @@ use std::ascii;
 use crate::{
     compilation_error::CompilationError,
     context::{CompilationContext, TypeContext},
+    typesig,
     typing::{TypeEnum, TypeError, TypePrimitive},
 };
 
@@ -41,10 +42,10 @@ impl From<u64> for Primitive {
 
 impl Expression for Primitive {
     fn resolve(&self, _: &TypeContext) -> Result<TypeEnum, TypeError> {
-        Ok(TypeEnum::Simple(match self {
-            Primitive::UInt64(_) => TypePrimitive::UInt64,
-            Primitive::Byteslice(_) => TypePrimitive::Byteslice,
-        }))
+        Ok(match self {
+            Primitive::UInt64(_) => typesig!(int),
+            Primitive::Byteslice(_) => typesig!(bytes),
+        })
     }
 
     fn compile(
