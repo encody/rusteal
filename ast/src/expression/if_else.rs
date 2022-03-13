@@ -2,8 +2,9 @@ use crate::{
     compilation_error::CompilationError,
     context::{CompilationContext, TypeContext},
     label::create_label_id,
+    typesig,
     typing::{TypeEnum, TypeError, TypePrimitive, TypeVar},
-    OP_SEPARATOR, typesig,
+    OP_SEPARATOR,
 };
 
 use super::{Expr, Expression};

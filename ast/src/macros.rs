@@ -176,42 +176,42 @@ macro_rules! ret {
 
 #[macro_export]
 /// Type signatures may be written using the syntax:
-/// 
+///
 /// ```rs
 /// typesig!(<typesig>)
 /// ```
-/// 
+///
 /// where
-/// 
+///
 /// ```txt
 ///     <typesig> ::
 ///           <simpletype>
 ///         | <simpletype> -> <typesig>
-/// 
+///
 ///     <simpletype> ::
 ///           <typekw>
 ///         | :<ident>
 ///         | #<ident>
-/// 
+///
 ///     <typekw> ::
 ///           int
 ///         | bytes
 ///         | void
 ///         | halt
 /// ```
-/// 
+///
 /// `:a` syntax denotes unique type variable `a`.
-/// 
+///
 /// `#a` syntax interpolates identifier `a` from context:
-/// 
+///
 /// ```rs
 /// let id = typesig!(:a -> :a);
 /// ```
-/// 
+///
 /// `typesig!(:a -> :b -> :b)` is equivalent to `typesig!(:a -> #id)`
-/// 
+///
 /// Examples:
-/// 
+///
 /// ```rs
 /// typesig!(int);
 /// typesig!(bytes);
@@ -222,7 +222,7 @@ macro_rules! ret {
 /// typesig!(:a -> :b -> :a -> :c -> int);
 /// typesig!(:a -> #type_enum -> bytes);
 /// ```
-/// 
+///
 /// Function parameter syntax (e.g. `:a -> (:b -> :c) -> :d`) is not supported,
 /// though technically accessible through `#` interpolation.
 macro_rules! typesig {

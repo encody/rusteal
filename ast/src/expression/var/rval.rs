@@ -2,8 +2,9 @@ use crate::{
     compilation_error::CompilationError,
     context::{CompilationBinding, CompilationContext, TypeContext},
     expression::{primitive::Primitive, Expression},
+    typesig,
     typing::{TypeEnum, TypeError, TypePrimitive, TypeVar},
-    OP_SEPARATOR, typesig,
+    OP_SEPARATOR,
 };
 
 use super::Var;
