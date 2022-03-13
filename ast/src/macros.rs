@@ -158,6 +158,15 @@ macro_rules! r#if {
         )
     };
 }
+#[macro_export]
+macro_rules! ret {
+    ($e:expr) => {
+        apply!(
+            @fn Expr::Ret(Ret);
+            @arg $e;
+        )
+    };
+}
 
 #[cfg(test)]
 mod tests {
@@ -167,6 +176,7 @@ mod tests {
     use crate::expression::cond::Cond;
     use crate::expression::if_else::If;
     use crate::expression::primitive::Primitive;
+    use crate::expression::ret::Ret;
     use crate::expression::seq::Seq;
     use crate::expression::var::{LVal, RVal, Var};
     use crate::expression::{Expr, Expression};
@@ -194,6 +204,7 @@ mod tests {
                 @then bytes!(">4".into());
                 @else bytes!("<=4".into());
             );
+            ret!(int!(1));
         });
         println!("{}", x.compile_raw().unwrap());
 
