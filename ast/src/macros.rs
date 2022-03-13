@@ -190,17 +190,25 @@ macro_rules! ret {
 /// 
 ///     <simpletype> ::
 ///           <typekw>
-///         | :<typevar>
+///         | :<ident>
+///         | #<ident>
 /// 
 ///     <typekw> ::
 ///           int
 ///         | bytes
 ///         | void
 ///         | halt
-/// 
-///     <typevar> ::
-///         (any identifier that does not match <typekw>)
 /// ```
+/// 
+/// `:a` syntax denotes unique type variable `a`.
+/// 
+/// `#a` syntax interpolates identifier `a` from context:
+/// 
+/// ```rs
+/// let id = typesig!(:a -> :a);
+/// ```
+/// 
+/// `typesig!(:a -> :b -> :b)` is equivalent to `typesig!(:a -> #id)`
 /// 
 /// Examples:
 /// 
@@ -212,23 +220,28 @@ macro_rules! ret {
 /// typesig!(:a -> :a);
 /// typesig!(:a -> :b);
 /// typesig!(:a -> :b -> :a -> :c -> int);
+/// typesig!(:a -> #type_enum -> bytes);
 /// ```
 /// 
-/// Function parameter syntax (e.g. `:a -> (:b -> :c) -> :d`) is not supported
+/// Function parameter syntax (e.g. `:a -> (:b -> :c) -> :d`) is not supported,
+/// though technically accessible through `#` interpolation.
 macro_rules! typesig {
-    ($(@_context $t:ident)? int) => {
+    (@_context $t:ident int) => {
         TypeEnum::Simple(TypePrimitive::UInt64)
     };
-    ($(@_context $t:ident)? bytes) => {
+    (@_context $t:ident bytes) => {
         TypeEnum::Simple(TypePrimitive::Byteslice)
     };
-    ($(@_context $t:ident)? void) => {
+    (@_context $t:ident void) => {
         TypeEnum::Simple(TypePrimitive::Void)
     };
-    ($(@_context $t:ident)? halt) => {
+    (@_context $t:ident halt) => {
         TypeEnum::Simple(TypePrimitive::Halt)
     };
-    ($(:)? $a:ident) => {
+    (# $a:ident) => {
+        $a
+    };
+    (: $a:ident) => {
         TypeEnum::Var(TypeVar::new())
     };
     (@get_tvar $t:ident $i:ident) => {
@@ -243,22 +256,40 @@ macro_rules! typesig {
             }
         }
     };
-    (@_context $t:ident $(:)? $a:ident) => {
+    (@_context $t:ident : $a:ident) => {
         typesig!(@get_tvar $t $a)
     };
-    (@_context $t:ident $(:)? $a:ident $($(->)? $(:)? $b:ident)+) => {
+    (@_context $t:ident # $a:ident) => {
+        $a
+    };
+    (@_context $t:ident $a:ident -> $($tt:tt)+) => {
         TypeEnum::Arrow(
             Box::new(typesig!(@_context $t $a)),
-            Box::new(typesig!(@_context $t $($b)+)),
+            Box::new(typesig!(@_context $t $($tt)+)),
         )
     };
-    ($(:)? $a:ident $(-> $(:)? $b:ident)+) => {
+    (@_context $t:ident : $a:ident -> $($tt:tt)+) => {
+        TypeEnum::Arrow(
+            Box::new(typesig!(@_context $t : $a)),
+            Box::new(typesig!(@_context $t $($tt)+)),
+        )
+    };
+    (@_context $t:ident # $a:ident -> $($tt:tt)+) => {
+        TypeEnum::Arrow(
+            Box::new($a),
+            Box::new(typesig!(@_context $t $($tt)+)),
+        )
+    };
+    (@_context $($tt:tt)*) => {
+        compile_error!("Invalid type signature syntax")
+    };
+    ($($tt:tt)+) => {
         {
             // This is less efficient than writing the type by hand
             // Another possible option:
             // https://stackoverflow.com/a/64957454 (generate custom struct with fields for each unique tvar?)
             let mut _tvars: std::collections::HashMap<&'static str, TypeVar> = std::collections::HashMap::new();
-            typesig!(@_context _tvars $a $($b)+)
+            typesig!(@_context _tvars $($tt)+)
         }
     };
 }
@@ -275,11 +306,12 @@ mod tests {
     use crate::expression::seq::Seq;
     use crate::expression::var::{LVal, RVal, Var};
     use crate::expression::{Expr, Expression};
-    use crate::typing::{TypeEnum, TypeVar, TypePrimitive};
+    use crate::typing::{TypeEnum, TypePrimitive, TypeVar};
 
     #[test]
     fn test_typesig() {
-        let mut t = typesig!(:a -> :a -> :b -> int);
+        let interpolate = typesig!(:a -> int);
+        let mut t = typesig!(:a -> :a -> #interpolate);
         let mut t2 = typesig!(:c -> :c -> :asdf -> int);
         let expected = "'a -> 'a -> 'b -> int";
         println!("{}", t);

@@ -1,7 +1,7 @@
 use crate::{
     compilation_error::CompilationError,
     context::{CompilationContext, TypeContext},
-    typing::{TypeEnum, TypeError, TypePrimitive}, typesig,
+    typing::{TypeEnum, TypeError, TypePrimitive, TypeVar}, typesig,
 };
 
 use super::Expression;
