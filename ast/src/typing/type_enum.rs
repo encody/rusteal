@@ -83,6 +83,11 @@ impl TypeEnum {
             "{}",
             match self {
                 TypeEnum::Simple(s) => format!("{}", s),
+                TypeEnum::Arrow(a, b) if matches!(**a, TypeEnum::Arrow(..)) => format!(
+                    "({}) -> {}",
+                    a.stringify_with_tvars(tvars),
+                    b.stringify_with_tvars(tvars)
+                ),
                 TypeEnum::Arrow(a, b) => format!(
                     "{} -> {}",
                     a.stringify_with_tvars(tvars),
