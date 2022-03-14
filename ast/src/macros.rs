@@ -115,6 +115,9 @@ macro_rules! binop {
     (($a:expr) % ($b:expr)) => {
         apply!(@fn Expr::Binary(Binary::Modulo); @arg $b; @arg $a)
     };
+    (($a:expr) ** ($b:expr)) => {
+        apply!(@fn Expr::Binary(Binary::Exp); @arg $b; @arg $a)
+    };
     (($a:expr) & ($b:expr)) => {
         apply!(@fn Expr::Binary(Binary::BitAnd); @arg $b; @arg $a)
     };

@@ -24,6 +24,7 @@ pub enum Binary {
     Multiply,
     Divide,
     Modulo,
+    Exp,
     ShiftLeft,
     ShiftRight,
 
@@ -75,6 +76,7 @@ impl Expression for Binary {
             Binary::Multiply => op(a, "*", b),
             Binary::Divide => op(a, "/", b),
             Binary::Modulo => op(a, "%", b),
+            Binary::Exp => op(a, "exp", b),
             Binary::ShiftLeft => op(a, "shl", b),
             Binary::ShiftRight => op(a, "shr", b),
             Binary::BitOr => op(a, "|", b),
