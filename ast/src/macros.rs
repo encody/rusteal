@@ -108,6 +108,12 @@ macro_rules! binop {
     (($a:expr) || ($b:expr)) => {
         apply!(@fn Expr::Binary(Binary::Or); @arg $b; @arg $a)
     };
+    (($a:expr) << ($b:expr)) => {
+        apply!(@fn Expr::Binary(Binary::ShiftLeft); @arg $b; @arg $a)
+    };
+    (($a:expr) >> ($b:expr)) => {
+        apply!(@fn Expr::Binary(Binary::ShiftRight); @arg $b; @arg $a)
+    };
 }
 
 #[macro_export]
