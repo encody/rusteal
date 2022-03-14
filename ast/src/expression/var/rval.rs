@@ -2,7 +2,8 @@ use crate::{
     compilation_error::CompilationError,
     context::{CompilationBinding, CompilationContext, TypeContext},
     expression::{primitive::Primitive, Expression},
-    typing::{TypeEnum, TypeError, TypePrimitive},
+    typesig,
+    typing::{TypeEnum, TypeError, TypePrimitive, TypeVar},
     OP_SEPARATOR,
 };
 
@@ -13,16 +14,12 @@ pub struct RVal(pub Var);
 
 impl Expression for RVal {
     fn resolve(&self, context: &TypeContext) -> Result<TypeEnum, TypeError> {
-        let type_enum = self.0.get_type(context)?;
+        let type_enum = self.0.get_type(context)?.clone();
 
-        if let Var::Local(..) = self.0 {
-            Ok(TypeEnum::Arrow(
-                Box::new(TypeEnum::Simple(TypePrimitive::UInt64)),
-                Box::new(type_enum.clone()),
-            ))
-        } else {
-            Ok(type_enum.clone())
-        }
+        Ok(match self.0 {
+            Var::Local(..) => typesig!(int -> #type_enum),
+            _ => type_enum,
+        })
     }
 
     fn compile(

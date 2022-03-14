@@ -2,7 +2,8 @@ use crate::{
     compilation_error::CompilationError,
     context::{CompilationContext, TypeContext},
     label::create_label_id,
-    typing::{TypeEnum, TypeError, TypePrimitive},
+    typesig,
+    typing::{TypeEnum, TypeError, TypePrimitive, TypeVar},
     OP_SEPARATOR,
 };
 
@@ -17,10 +18,7 @@ impl Expression for If {
         let mut true_type = true_expression.resolve(context)?;
         let mut false_type = false_expression.resolve(context)?;
         true_type.unify(&mut false_type)?;
-        Ok(TypeEnum::Arrow(
-            Box::new(TypeEnum::Simple(TypePrimitive::UInt64)),
-            Box::new(true_type),
-        ))
+        Ok(typesig!(int -> #true_type))
     }
 
     fn compile(

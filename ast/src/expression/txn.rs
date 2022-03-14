@@ -4,7 +4,7 @@ use crate::{
     compilation_error::CompilationError,
     context::{CompilationContext, TypeContext},
     typesig,
-    typing::{TypeEnum, TypeError, TypePrimitive},
+    typing::{TypeEnum, TypeError, TypePrimitive, TypeVar},
 };
 
 use super::Expression;

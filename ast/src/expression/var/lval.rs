@@ -2,7 +2,8 @@ use crate::{
     compilation_error::CompilationError,
     context::{CompilationBinding, CompilationContext, TypeContext},
     expression::{primitive::Primitive, Expression},
-    typing::{TypeEnum, TypeError, TypePrimitive},
+    typesig,
+    typing::{TypeEnum, TypeError, TypePrimitive, TypeVar},
     OP_SEPARATOR,
 };
 
@@ -13,19 +14,11 @@ pub struct LVal(pub Var);
 
 impl Expression for LVal {
     fn resolve(&self, context: &TypeContext) -> Result<TypeEnum, TypeError> {
-        let type_enum = self.0.get_type(context)?;
-
-        let assign = TypeEnum::Arrow(
-            Box::new(type_enum.clone()),
-            Box::new(TypeEnum::Simple(TypePrimitive::Void)),
-        );
+        let type_enum = self.0.get_type(context)?.clone();
 
         Ok(match self.0 {
-            Var::Local(..) => TypeEnum::Arrow(
-                Box::new(TypeEnum::Simple(TypePrimitive::UInt64)),
-                Box::new(assign),
-            ),
-            _ => assign,
+            Var::Local(..) => typesig!(int -> #type_enum -> void),
+            _ => typesig!(#type_enum -> void),
         })
     }
 
