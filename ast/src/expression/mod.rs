@@ -14,6 +14,7 @@ pub mod primitive;
 pub mod ret;
 pub mod seq;
 pub mod txn;
+pub mod unary;
 pub mod var;
 
 #[derive(Debug, Clone, PartialEq)]
@@ -28,6 +29,7 @@ pub enum Expr {
     Ret(ret::Ret),
     Seq(Box<seq::Seq>),
     Txn(txn::Txn),
+    Unary(unary::Unary),
     LVal(var::LVal),
     RVal(var::RVal),
 }
@@ -58,6 +60,7 @@ impl Expression for Expr {
             Expr::Ret(expr) => expr.resolve(context),
             Expr::Seq(expr) => expr.resolve(context),
             Expr::Txn(expr) => expr.resolve(context),
+            Expr::Unary(expr) => expr.resolve(context),
             Expr::LVal(expr) => expr.resolve(context),
             Expr::RVal(expr) => expr.resolve(context),
         }
@@ -79,6 +82,7 @@ impl Expression for Expr {
             Expr::Ret(expr) => expr.compile(context, prepared_stack),
             Expr::Seq(expr) => expr.compile(context, prepared_stack),
             Expr::Txn(expr) => expr.compile(context, prepared_stack),
+            Expr::Unary(expr) => expr.compile(context, prepared_stack),
             Expr::LVal(expr) => expr.compile(context, prepared_stack),
             Expr::RVal(expr) => expr.compile(context, prepared_stack),
         }

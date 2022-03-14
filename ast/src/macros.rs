@@ -59,6 +59,28 @@ macro_rules! apply {
 }
 
 #[macro_export]
+macro_rules! unop {
+    (len $a:expr) => {
+        apply!(@fn Expr::Unary(Unary::Len); @arg $a)
+    };
+    (! $a:expr) => {
+        apply!(@fn Expr::Unary(Unary::Not); @arg $a)
+    };
+    (~ $a:expr) => {
+        apply!(@fn Expr::Unary(Unary::BitInvert); @arg $a)
+    };
+    (itob $a:expr) => {
+        apply!(@fn Expr::Unary(Unary::ItoB); @arg $a)
+    };
+    (btoi $a:expr) => {
+        apply!(@fn Expr::Unary(Unary::BtoI); @arg $a)
+    };
+    (sqrt $a:expr) => {
+        apply!(@fn Expr::Unary(Unary::Sqrt); @arg $a)
+    };
+}
+
+#[macro_export]
 macro_rules! binop {
     (($a:expr) == ($b:expr)) => {
         apply!(@fn Expr::Binary(Binary::Equals); @arg $b; @arg $a)
