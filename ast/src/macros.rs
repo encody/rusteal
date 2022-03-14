@@ -2,8 +2,6 @@
 
 // trace_macros!(true);
 
-use crate::typing::TypeVar;
-
 #[macro_export]
 macro_rules! int {
     ($e: expr) => {
@@ -79,6 +77,36 @@ macro_rules! binop {
     };
     (($a:expr) <= ($b:expr)) => {
         apply!(@fn Expr::Binary(Binary::LessThanEquals); @arg $b; @arg $a)
+    };
+    (($a:expr) + ($b:expr)) => {
+        apply!(@fn Expr::Binary(Binary::Plus); @arg $b; @arg $a)
+    };
+    (($a:expr) - ($b:expr)) => {
+        apply!(@fn Expr::Binary(Binary::Minus); @arg $b; @arg $a)
+    };
+    (($a:expr) * ($b:expr)) => {
+        apply!(@fn Expr::Binary(Binary::Multiply); @arg $b; @arg $a)
+    };
+    (($a:expr) / ($b:expr)) => {
+        apply!(@fn Expr::Binary(Binary::Divide); @arg $b; @arg $a)
+    };
+    (($a:expr) % ($b:expr)) => {
+        apply!(@fn Expr::Binary(Binary::Modulo); @arg $b; @arg $a)
+    };
+    (($a:expr) & ($b:expr)) => {
+        apply!(@fn Expr::Binary(Binary::BitAnd); @arg $b; @arg $a)
+    };
+    (($a:expr) | ($b:expr)) => {
+        apply!(@fn Expr::Binary(Binary::BitOr); @arg $b; @arg $a)
+    };
+    (($a:expr) ^ ($b:expr)) => {
+        apply!(@fn Expr::Binary(Binary::BitXor); @arg $b; @arg $a)
+    };
+    (($a:expr) && ($b:expr)) => {
+        apply!(@fn Expr::Binary(Binary::And); @arg $b; @arg $a)
+    };
+    (($a:expr) || ($b:expr)) => {
+        apply!(@fn Expr::Binary(Binary::Or); @arg $b; @arg $a)
     };
 }
 

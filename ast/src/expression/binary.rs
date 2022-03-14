@@ -10,12 +10,29 @@ use super::Expression;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Binary {
+    // Comparison operators
     Equals,
     NotEquals,
     GreaterThan,
     GreaterThanEquals,
     LessThan,
     LessThanEquals,
+
+    // Mathematic operators
+    Plus,
+    Minus,
+    Multiply,
+    Divide,
+    Modulo,
+
+    // Bitwise operators
+    BitOr,
+    BitAnd,
+    BitXor,
+
+    // Logical operators
+    And,
+    Or,
 }
 
 fn op(l: String, s: &str, r: String) -> Result<String, CompilationError> {
@@ -28,15 +45,12 @@ fn op(l: String, s: &str, r: String) -> Result<String, CompilationError> {
 impl Expression for Binary {
     fn resolve(&self, _: &TypeContext) -> Result<TypeEnum, TypeError> {
         Ok(match self {
-            // function binary(a: uint, b: uint): uint;
-            // uint -> uint -> uint
-            Binary::GreaterThan
-            | Binary::GreaterThanEquals
-            | Binary::LessThan
-            | Binary::LessThanEquals => typesig!(int -> int -> int),
             // function binary<T>(a: T, b: T): uint;
             // 'a -> 'a -> uint
             Binary::Equals | Binary::NotEquals => typesig!(:a -> :a -> int),
+            // function binary(a: uint, b: uint): uint;
+            // uint -> uint -> uint
+            _ => typesig!(int -> int -> int),
         })
     }
 
@@ -54,6 +68,16 @@ impl Expression for Binary {
             Binary::GreaterThanEquals => op(a, ">=", b),
             Binary::LessThan => op(a, "<", b),
             Binary::LessThanEquals => op(a, "<=", b),
+            Binary::Plus => op(a, "+", b),
+            Binary::Minus => op(a, "-", b),
+            Binary::Multiply => op(a, "*", b),
+            Binary::Divide => op(a, "/", b),
+            Binary::Modulo => op(a, "%", b),
+            Binary::BitOr => op(a, "|", b),
+            Binary::BitAnd => op(a, "&", b),
+            Binary::BitXor => op(a, "^", b),
+            Binary::And => op(a, "&&", b),
+            Binary::Or => op(a, "||", b),
         }
     }
 }
